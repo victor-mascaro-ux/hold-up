@@ -6,12 +6,13 @@ window.TEXTS["en"] = {
   // Browser tab title
   gameTitle: "Hold Up!",
 
-  // The language switch: this language's own button, and the switch's name
-  // for screen readers
-  languageButton: "EN",
-  languageSwitchName: "Language",
+  // Settings, behind the button at the right of the chat header
+  settings: "Settings",
+  languageTitle: "Language",
+  languageName: "English",
 
   // Family chat
   familyGroupName: "Family 🙏 (NO politics!!)",
+  familyMembers: "Grandpa Jorge, Cousin Nina, Mom, Aunt Rosa, you",
   messagesName: "Messages",
 };

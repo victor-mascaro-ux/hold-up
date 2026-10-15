@@ -1,11 +1,23 @@
-/* Colours and sizes. The colours are placeholders until the art style is picked. */
+/* Colours, named as in ART.md */
 :root {
-  --bar: #3d2c4e;
-  --bar-text: #ffffff;
-  --wallpaper: #f6efe6;
-  --outside: #e6ddd1;
-  --avatar: #f2c14e;
-  --tap: 44px; /* smallest tap target */
+  --cream: #FBF3E6;      /* app background */
+  --sand: #F3E3C8;       /* header, bottom panel, day chips */
+  --white: #FFFFFF;      /* message bubbles and cards */
+  --ink: #3B2A20;        /* main text and icons */
+  --cocoa: #6B5444;      /* secondary text */
+  --muted: #7A5E48;      /* small text */
+  --rust: #B4472A;       /* group icon, strong accents */
+  --brick: #9A4A28;      /* sender names, text on blush */
+  --terracotta: #E07A55; /* ring around the post being judged, Stop */
+  --blush: #FBE3D6;      /* "Forwarded" chip */
+  --sage: #3F6B47;       /* Share */
+  --marigold: #F6D27A;   /* Needs context */
+  --marigold-accent: #F2B33D;
+  --shadow: #EAD9BF;     /* the 1px shadow under bubbles and cards */
+
+  --tap: 44px;           /* smallest tap target */
+  --display: "Fredoka", "Nunito", system-ui, sans-serif;
+  --text: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -13,10 +25,13 @@
 html, body { height: 100%; margin: 0; }
 
 body {
-  background: var(--outside);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--text);
   -webkit-text-size-adjust: 100%;
 }
+
+button { font: inherit; color: inherit; }
 
 /* One chat fills the phone screen. On a computer it stays phone-width for now. */
 .chat {
@@ -26,81 +41,138 @@ body {
   height: 100dvh;
   max-width: 480px;
   margin: 0 auto;
-  background: var(--wallpaper);
+  background: var(--cream);
 }
 
-/* Top bar: group picture, group name, language switch */
+/* Top bar: group icon, group name and members, settings */
 .chat-bar {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-  padding-top: calc(8px + env(safe-area-inset-top));
-  background: var(--bar);
-  color: var(--bar-text);
+  gap: 10px;
+  padding: 12px 6px 12px 14px;
+  padding-top: calc(12px + env(safe-area-inset-top));
+  background: var(--sand);
 }
 
-.chat-avatar {
+.group-icon {
   flex: none;
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  background: var(--avatar);
-  font-size: 22px;
+  background: var(--rust);
+  color: var(--white);
+}
+
+.chat-title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .chat-name {
-  flex: 1;
-  min-width: 0;
   margin: 0;
-  font-size: 17px;
+  font-family: var(--display);
   font-weight: 600;
-  line-height: 1.25;
-  /* Long group names wrap to two lines at most */
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.chat-members {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--cocoa);
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.language-switch {
+.icon-button {
   flex: none;
-  display: flex;
-  padding: 2px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 999px;
-}
-
-.language-switch button {
-  min-width: var(--tap);
-  min-height: var(--tap);
-  padding: 0 8px;
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  padding: 0;
   border: 0;
-  border-radius: 999px;
+  border-radius: 50%;
   background: transparent;
-  color: var(--bar-text);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
+  color: var(--ink);
   cursor: pointer;
 }
 
-.language-switch button[aria-pressed="true"] {
-  background: var(--bar-text);
-  color: var(--bar);
-}
+.icon-button[aria-expanded="true"] { background: var(--cream); }
 
-.language-switch button:focus-visible {
-  outline: 2px solid var(--avatar);
+:focus-visible {
+  outline: 2.5px solid var(--rust);
   outline-offset: 2px;
 }
+
+/* Settings: a card that drops down under the settings button */
+.settings-panel {
+  position: absolute;
+  top: calc(100% - 4px);
+  right: 10px;
+  width: min(260px, calc(100% - 20px));
+  padding: 14px 8px 8px;
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 1px 0 var(--shadow), 0 10px 28px rgba(59, 42, 32, 0.16);
+}
+
+.settings-panel[hidden] { display: none; }
+
+.panel-title {
+  margin: 0 8px 8px;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.language-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  font-size: 15.5px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* The chosen language is shown by a tick and weight, not colour alone */
+.language-option[aria-pressed="true"] {
+  background: var(--cream);
+  font-weight: 800;
+}
+
+.language-option svg { flex: none; visibility: hidden; }
+.language-option[aria-pressed="true"] svg { visibility: visible; }
 
 /* Where the messages will appear */
 .chat-messages {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 12px;
   overflow-y: auto;
-  padding: 16px;
+  padding: 14px 14px 16px;
   padding-bottom: calc(16px + env(safe-area-inset-bottom));
 }

@@ -3,15 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F3E3C8">
   <title>Hold Up! / Peraí!</title>
+  <link rel="stylesheet" href="fonts/fonts.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="chat">
     <header class="chat-bar">
-      <div class="chat-avatar" aria-hidden="true">👨‍👩‍👧‍👦</div>
-      <h1 class="chat-name" data-text="familyGroupName"></h1>
-      <div class="language-switch" role="group" data-label="languageSwitchName"></div>
+      <div class="group-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z"/></svg>
+      </div>
+      <div class="chat-title">
+        <h1 class="chat-name" data-text="familyGroupName"></h1>
+        <p class="chat-members" data-text="familyMembers"></p>
+      </div>
+      <button class="icon-button" id="settings-button" type="button" data-label="settings" aria-expanded="false" aria-controls="settings-panel">
+        <svg width="22" height="22" viewBox="0 0 24 24" overflow="visible" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      <div class="settings-panel" id="settings-panel" hidden>
+        <h2 class="panel-title" id="language-title" data-text="languageTitle"></h2>
+        <div class="language-options" role="group" aria-labelledby="language-title"></div>
+      </div>
     </header>
     <main class="chat-messages" data-label="messagesName"></main>
   </div>

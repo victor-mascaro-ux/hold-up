@@ -6,12 +6,13 @@ window.TEXTS["pt-BR"] = {
   // Browser tab title
   gameTitle: "Peraí!",
 
-  // The language switch: this language's own button, and the switch's name
-  // for screen readers
-  languageButton: "PT-BR",
-  languageSwitchName: "Idioma",
+  // Settings, behind the button at the right of the chat header
+  settings: "Configurações",
+  languageTitle: "Idioma",
+  languageName: "Português (Brasil)",
 
   // Family chat
   familyGroupName: "Família Unida ❤️🙏",
+  familyMembers: "Vô Jorge, Prima Nina, Mãe, Tia Rosa, você",
   messagesName: "Mensagens",
 };
