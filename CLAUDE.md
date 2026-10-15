@@ -41,16 +41,19 @@ A mobile-first web game about spotting misinformation in group chats.
 
 The current draft is the `sprint-1` branch. `main` is what's live.
 
-- **After every task:** commit the work on the draft and push it to GitHub as a
-  backup. This does not change the live site.
+- **After every task, always publish (Victor's standing instruction, Oct 15,
+  2026):** commit the work on the draft, push it to GitHub, then publish as
+  below, without asking. Tell Victor it's live once the run has finished.
 - **"save this version as [name]":** commit any open work, then create an
   annotated tag for that name (spaces become hyphens; say so) and push the tag.
 - **"go back to [name]":** `git restore --source=<tag> --staged --worktree -- .`,
   then commit it as "Go back to [name]" and push the draft. Nothing after the
-  bookmark is lost, so the step can be undone the same way. Going back does not
-  publish.
+  bookmark is lost, so the step can be undone the same way. Then publish, so
+  the live site matches.
 - **"publish":** bring `main` up to the draft (`git push origin sprint-1:main`,
   merging first if `main` has moved) and push. GitHub Actions
   (`.github/workflows/publish.yml`) puts it online about a minute later at
   https://victor-mascaro-ux.github.io/hold-up/ — check the run finished before
   saying it's live.
+- If a push hangs, the Windows sign-in helper is stuck: end
+  `git-credential-manager.exe` and the push finishes.
