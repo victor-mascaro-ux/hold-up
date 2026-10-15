@@ -27,7 +27,24 @@ A mobile-first web game about spotting misinformation in group chats.
 - Files: `index.html` (the page), `style.css` (colours at the top, named as in
   ART.md), `game.js` (the code), `lang/` (texts), `characters.js` (the cast,
   one SVG per character with a face setting), `fonts/fonts.css` (Fredoka and
-  Nunito, embedded so they work offline), `art/` (reference and cast sheet).
+  Nunito, embedded so they work offline), `art/` (reference, cast sheet and
+  `sketch.html`, the chat screen sketch), `posts/` (`family.js` holds the
+  posts; `review.html` shows them side by side for Victor to read).
+
+## Posts
+
+- Every post is modelled on a famous real hoax from Brazil or the US (Victor's
+  rule), recorded in its `basedOn` with sources. Keep the GDD's content rules
+  too: invented outlets, people, brands and towns, our own wording,
+  non-partisan topics, about half true. True posts copy the look of a famous
+  hoax (the decoy) but are real.
+- English posts happen in Tallowbrook, Portuguese ones in Pouso Sereno. Write
+  each language for its own players (Brazilian details in PT-BR: reais, Pix,
+  CPF, Defesa Civil), never as a translation; only the trick and the right
+  answer must match.
+- Every real-world claim gets a `factCheck` entry with what was found and its
+  sources. They show as FACT-CHECK on `posts/review.html` until Victor has read
+  them; remove the marks only when he says so.
 - The language is chosen once, on the welcome screen, and remembered in the
   browser. Posts are written for each language, so it never changes mid-game:
   the only way back is "Start over" in the settings card, which returns to the

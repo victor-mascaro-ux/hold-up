@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Family posts review</title>
+  <!-- A reading page for Victor: every Family post as it looks in the chat, in
+       English and Portuguese side by side, with the answer, what the tools
+       show, the replies, the real hoax it's based on and the fact-checks.
+       The posts come from family.js; this page only displays them. -->
+  <link rel="stylesheet" href="../fonts/fonts.css">
+  <style>
+    :root {
+      --cream: #FBF3E6;
+      --sand: #F3E3C8;
+      --white: #FFFFFF;
+      --ink: #3B2A20;
+      --cocoa: #6B5444;
+      --muted: #7A5E48;
+      --rust: #B4472A;
+      --brick: #9A4A28;
+      --terracotta: #E07A55;
+      --blush: #FBE3D6;
+      --sage: #3F6B47;
+      --marigold: #F6D27A;
+      --marigold-accent: #F2B33D;
+      --shadow: #EAD9BF;
+      --card: #F7EBD8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: "Nunito", system-ui, sans-serif;
+      font-size: 15.5px;
+      line-height: 1.4;
+    }
+    h1, h2, h3 { font-family: "Fredoka", "Nunito", sans-serif; font-weight: 600; margin: 0; }
+    a { color: var(--brick); }
+    .page { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; }
+    .intro h1 { font-size: 26px; }
+    .intro p { margin: 6px 0 0; color: var(--cocoa); }
+    .summary { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; padding: 0; list-style: none; }
+    .summary li { background: var(--sand); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 700; color: var(--cocoa); }
+
+    .post { margin-top: 28px; background: var(--sand); border-radius: 22px; padding: 16px; }
+    .post-head { display: flex; align-items: flex-start; gap: 12px; }
+    .post-head .avatar { margin-top: 2px; }
+    .post-head h2 { font-size: 18px; line-height: 1.25; }
+    .post-head .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; }
+
+    .chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 800; line-height: 1.4; }
+    .chip svg { flex: none; }
+    .verdict-share { background: var(--sage); color: var(--white); }
+    .verdict-stop { background: var(--terracotta); color: var(--ink); }
+    .verdict-needs-context { background: var(--marigold); color: var(--ink); }
+    .chip-plain { background: var(--white); color: var(--cocoa); box-shadow: 0 1px 0 var(--shadow); }
+    .chip-blush { background: var(--blush); color: var(--brick); }
+
+    .langs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+    .lang { background: var(--cream); border-radius: 16px; padding: 14px; min-width: 0; }
+    .lang-label { font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+
+    .bubble { margin-top: 8px; background: var(--white); border-radius: 18px 18px 18px 6px; padding: 8px; box-shadow: 0 1px 0 var(--shadow); display: flex; flex-direction: column; gap: 6px; }
+    .bubble .sender { padding: 0 5px; font-size: 13px; font-weight: 800; color: var(--brick); }
+    .bubble .message { padding: 0 5px 2px; }
+    .preview { border-radius: 12px; overflow: hidden; background: var(--card); }
+    .preview .art { height: 64px; display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--marigold); color: var(--ink); font-size: 12px; font-weight: 700; }
+    .preview .body { padding: 8px 10px 10px; display: flex; flex-direction: column; gap: 3px; }
+    .preview .site { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+    .preview .headline { font-family: "Fredoka", "Nunito", sans-serif; font-weight: 600; font-size: 16px; line-height: 1.25; }
+    .preview.alert .body { gap: 6px; }
+    .preview.alert .headline, .preview.social .headline { font-family: "Nunito", sans-serif; font-weight: 700; font-size: 15px; line-height: 1.4; }
+
+    .section { margin-top: 14px; }
+    .section h3 { font-size: 15px; margin-bottom: 6px; }
+    .tools { display: flex; flex-direction: column; gap: 8px; }
+    .tool { background: var(--white); border-radius: 12px; padding: 8px 10px; box-shadow: 0 1px 0 var(--shadow); }
+    .tool-name { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--cocoa); }
+    .tool p { margin: 4px 0 0; }
+    .tool .evidence { background: var(--blush); border-radius: 6px; padding: 0 3px; }
+    .tool ol { margin: 4px 0 0; padding-left: 20px; }
+    .tool li { margin-top: 4px; }
+    .explain { margin: 0; }
+
+    .replies { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .reply { background: var(--white); border-radius: 18px 18px 6px 18px; padding: 8px 12px 10px; box-shadow: 0 1px 0 var(--shadow); }
+    .reply .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+
+    .notes { margin-top: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .note { background: var(--white); border-radius: 16px; padding: 12px 14px; box-shadow: 0 1px 0 var(--shadow); min-width: 0; }
+    .note h3 { font-size: 15px; margin-bottom: 6px; }
+    .note p { margin: 0; }
+    .note ul { margin: 8px 0 0; padding-left: 18px; }
+    .note li { margin-top: 6px; overflow-wrap: anywhere; }
+    .fact { margin-top: 10px; }
+    .fact:first-of-type { margin-top: 0; }
+    .fact .flag { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: var(--brick); background: var(--blush); border-radius: 999px; padding: 2px 9px; }
+    .fact .claim { margin-top: 4px; font-weight: 700; }
+    .fact .finding { margin-top: 2px; color: var(--cocoa); }
+    .fact .links { font-size: 13px; overflow-wrap: anywhere; }
+
+    @media (max-width: 720px) {
+      .langs, .notes { grid-template-columns: minmax(0, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="intro">
+      <h1>Family posts: review</h1>
+      <p>Each post as it looks in the chat, in English and Portuguese side by side, with the right answer, what the checking tools show, the three replies, the real hoax it's based on, and what was fact-checked. Every FACT-CHECK below was checked against the sources listed; read them, and tell me what to change. Once you're happy, the marks come off.</p>
+      <ul class="summary" id="summary"></ul>
+    </div>
+    <div id="posts"></div>
+  </div>
+
+  <script src="../characters.js"></script>
+  <script src="family.js"></script>
+  <script>
+    // Labels for this reading page only; the game takes its texts from lang/.
+    var SENDERS = {
+      nina: { en: "Cousin Nina", "pt-BR": "Prima Nina" },
+      jorge: { en: "Grandpa Jorge", "pt-BR": "Vô Jorge" }
+    };
+    var VERDICTS = {
+      share: { label: "Share", icon: '<path d="M12 4v11"/><path d="M7 9l5-5 5 5"/><path d="M5 14v5h14v-5"/>' },
+      stop: { label: "Stop", icon: '<path d="M8.5 3h7L21 8.5v7L15.5 21h-7L3 15.5v-7z"/><path d="M8 12h8"/>' },
+      "needs-context": { label: "Needs context", icon: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><path d="M12 7.5v.01"/>' }
+    };
+    var TRICKS = {
+      "lookalike-address": "Lookalike address",
+      "too-good-giveaway": "Too-good giveaway",
+      "impersonated-account": "Impersonated account",
+      "headline-overstates": "Headline overstates the article",
+      "urgency-outrage": "Urgency and outrage"
+    };
+    var DECOYS = {
+      "all-caps": "All caps",
+      "urgency": "Sounds urgent",
+      "too-good-to-be-true": "Sounds too good to be true"
+    };
+    var FEATURES = {
+      empathy: "Empathy", source: "Source", joke: "Joke", short: "Short",
+      question: "Question", trueAlternative: "True alternative"
+    };
+    var KINDS = { link: "Link", post: "Social post", alert: "Alert" };
+    var LANG_NAMES = { en: "English", "pt-BR": "Português (Brasil)" };
+
+    function icon(paths, size) {
+      return '<svg width="' + (size || 13) + '" height="' + (size || 13) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+        'stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths + "</svg>";
+    }
+    var ICONS = {
+      zoom: '<circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/>',
+      person: '<circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+      article: '<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7M9 8h3"/>',
+      image: '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M21 16l-5-5-8 8"/>',
+      flag: '<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>',
+      check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+      warn: '<path d="M12 4l9 16H3z"/><path d="M12 10v4"/><path d="M12 17v.01"/>',
+      dash: '<path d="M6 12h12"/>'
+    };
+
+    function esc(text) {
+      return String(text).replace(/[&<>"]/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+      });
+    }
+
+    function verdictChip(verdict) {
+      var v = VERDICTS[verdict];
+      return '<span class="chip verdict-' + verdict + '">' + icon(v.icon) + v.label + "</span>";
+    }
+
+    function preview(post, t) {
+      if (post.kind === "alert") {
+        return '<div class="preview alert"><div class="body"><div class="site">' + esc(t.source.name) + "</div>" +
+          '<div class="headline">' + esc(t.headline) + "</div></div></div>";
+      }
+      if (post.kind === "post") {
+        return '<div class="preview social">' +
+          '<div class="art">' + icon(ICONS.image, 16) + "illustration: " + esc(post.image.art) + "</div>" +
+          '<div class="body"><div class="site">' + esc(t.source.name) + " · " + esc(t.source.url) + "</div>" +
+          '<div class="headline">' + esc(t.headline) + "</div></div></div>";
+      }
+      return '<div class="preview">' +
+        '<div class="art">' + icon(ICONS.image, 16) + "illustration: " + esc(post.image.art) + "</div>" +
+        '<div class="body"><div class="site">' + esc(t.source.url) + "</div>" +
+        '<div class="headline">' + esc(t.headline) + "</div></div></div>";
+    }
+
+    // What each checking tool reveals; the pieces that are the evidence are highlighted
+    function tools(post, t) {
+      var isEvidence = function (id) { return post.evidence.indexOf(id) !== -1; };
+      var mark = function (id, html) { return isEvidence(id) ? '<span class="evidence">' + html + "</span>" : html; };
+      var html = '<div class="tool"><div class="tool-name">' + icon(ICONS.zoom) + "Zoom</div><p>" +
+        mark("source.url", esc(t.source.url)) +
+        (t.finePrint ? "<br>" + mark("finePrint", esc(t.finePrint)) : "") + "</p></div>";
+      html += '<div class="tool"><div class="tool-name">' + icon(ICONS.person) + "Source card</div><p>" +
+        esc(t.source.name) + "<br>" + mark("source.about", esc(t.source.about)) + "</p></div>";
+      if (t.article) {
+        html += '<div class="tool"><div class="tool-name">' + icon(ICONS.article) + "Open the article</div><ol>" +
+          t.article.map(function (p, i) { return "<li>" + mark("article.p" + (i + 1), esc(p)) + "</li>"; }).join("") +
+          "</ol></div>";
+      }
+      return '<div class="tools">' + html + "</div>";
+    }
+
+    function citeTag(post, cites) {
+      if (!cites) return '<span class="chip chip-plain">' + icon(ICONS.dash) + "Names no trick</span>";
+      if (post.tricks.indexOf(cites) !== -1) {
+        return '<span class="chip chip-plain">' + icon(ICONS.check) + "Names: " + esc(TRICKS[cites]) + "</span>";
+      }
+      return '<span class="chip chip-blush">' + icon(ICONS.warn) + "Wrong reason: " + esc(TRICKS[cites]) + "</span>";
+    }
+
+    function replies(post, language) {
+      return '<ul class="replies">' + post.replies.map(function (reply) {
+        return '<li class="reply"><div>' + esc(reply[language]) + '</div><div class="tags">' +
+          reply.features.map(function (f) { return '<span class="chip chip-plain">' + FEATURES[f] + "</span>"; }).join("") +
+          citeTag(post, reply.cites) + "</div></li>";
+      }).join("") + "</ul>";
+    }
+
+    function languageColumn(post, language) {
+      var t = post.text[language];
+      return '<div class="lang" lang="' + language + '">' +
+        '<div class="lang-label">' + LANG_NAMES[language] + "</div>" +
+        '<div class="bubble"><div class="sender">' + SENDERS[post.sender][language] + "</div>" +
+        preview(post, t) + '<div class="message">' + esc(t.message) + "</div></div>" +
+        '<div class="section"><h3>What the tools show</h3>' + tools(post, t) + "</div>" +
+        '<div class="section"><h3>Why</h3><p class="explain">' + esc(t.explain) + "</p></div>" +
+        '<div class="section"><h3>Replies</h3>' + replies(post, language) + "</div>" +
+        "</div>";
+    }
+
+    function notes(post) {
+      var based = '<div class="note"><h3>Based on</h3><p>' + esc(post.basedOn.summary) + "</p><ul>" +
+        post.basedOn.sources.map(function (s) {
+          return '<li><a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.title) + "</a></li>";
+        }).join("") + "</ul></div>";
+      var facts = '<div class="note"><h3>Fact-checks</h3>' + post.factCheck.map(function (f) {
+        return '<div class="fact"><span class="flag">' + icon(ICONS.flag, 12) + "FACT-CHECK</span>" +
+          '<div class="claim">' + esc(f.claim) + "</div>" +
+          '<div class="finding">' + esc(f.finding) + "</div>" +
+          (f.sources.length ? '<div class="links">' + f.sources.map(function (url) {
+            return '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(url.replace(/^https?:\/\//, "").split("/")[0]) + "</a>";
+          }).join(" · ") + "</div>" : "") + "</div>";
+      }).join("") + "</div>";
+      return '<div class="notes">' + based + facts + "</div>";
+    }
+
+    function postCard(post, n) {
+      var labels = post.tricks.length
+        ? post.tricks.map(function (t) { return '<span class="chip chip-plain">Trick: ' + esc(TRICKS[t]) + "</span>"; })
+        : (post.decoys || []).map(function (d) { return '<span class="chip chip-plain">Decoy: ' + esc(DECOYS[d]) + "</span>"; });
+      return '<section class="post" id="' + post.id + '">' +
+        '<div class="post-head">' + Characters.avatar(post.sender, "neutral", 44) +
+        "<div><h2>" + n + ". " + SENDERS[post.sender].en + " · " + KINDS[post.kind] + "</h2>" +
+        '<div class="meta">' + verdictChip(post.verdict) + labels.join("") +
+        (post.severity != null ? '<span class="chip chip-plain">Severity ' + post.severity + "</span>" : "") +
+        "</div></div></div>" +
+        '<div class="langs">' + languageColumn(post, "en") + languageColumn(post, "pt-BR") + "</div>" +
+        notes(post) + "</section>";
+    }
+
+    var posts = window.POSTS;
+    var count = function (verdict) { return posts.filter(function (p) { return p.verdict === verdict; }).length; };
+    var factCount = posts.reduce(function (sum, p) { return sum + p.factCheck.length; }, 0);
+    document.getElementById("summary").innerHTML = [
+      posts.length + " posts",
+      count("share") + " Share",
+      count("stop") + " Stop",
+      count("needs-context") + " Needs context",
+      factCount + " fact-checks to read"
+    ].map(function (s) { return "<li>" + s + "</li>"; }).join("");
+    document.getElementById("posts").innerHTML = posts.map(function (p, i) { return postCard(p, i + 1); }).join("");
+  </script>
+</body>
+</html>

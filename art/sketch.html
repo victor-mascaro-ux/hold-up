@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chat screen sketch</title>
+  <!-- A sketch of the chat screen: Cousin Nina's first post (posts/family.js)
+       through the whole loop at phone size, then the computer layout from the
+       GDD. Follows ART.md. Nothing here is the game, and nothing is clickable
+       except the language switch. -->
+  <link rel="stylesheet" href="../fonts/fonts.css">
+  <style>
+    :root {
+      --cream: #FBF3E6;
+      --sand: #F3E3C8;
+      --white: #FFFFFF;
+      --ink: #3B2A20;
+      --cocoa: #6B5444;
+      --muted: #7A5E48;
+      --rust: #B4472A;
+      --brick: #9A4A28;
+      --terracotta: #E07A55;
+      --blush: #FBE3D6;
+      --sage: #3F6B47;
+      --marigold: #F6D27A;
+      --marigold-accent: #F2B33D;
+      --shadow: #EAD9BF;
+      --card: #F7EBD8;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--white); color: var(--ink); font-family: "Nunito", system-ui, sans-serif; }
+    .display { font-family: "Fredoka", "Nunito", sans-serif; font-weight: 600; }
+
+    .page-head { max-width: 1180px; margin: 0 auto; padding: 24px 16px 8px; display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .page-head h1 { margin: 0; font-size: 26px; }
+    .page-head p { margin: 4px 0 0; color: var(--cocoa); font-size: 15.5px; line-height: 1.4; max-width: 640px; }
+    .switch { display: flex; padding: 3px; background: var(--sand); border-radius: 999px; }
+    .switch button { min-width: 44px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: var(--ink); font: inherit; font-weight: 800; font-size: 14px; cursor: pointer; }
+    .switch button[aria-pressed="true"] { background: var(--white); box-shadow: 0 1px 0 var(--shadow); }
+
+    .steps { max-width: 1180px; margin: 0 auto; padding: 16px; display: flex; flex-wrap: wrap; justify-content: center; gap: 32px 24px; }
+    .step { width: 360px; max-width: 100%; }
+    .step-label { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; min-height: 64px; }
+    .step-num { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--rust); color: var(--white); display: grid; place-items: center; font-weight: 800; font-size: 14px; margin-top: 1px; }
+    .step-label h2 { margin: 0; font-size: 17px; }
+    .step-label p { margin: 2px 0 0; font-size: 13px; color: var(--cocoa); line-height: 1.35; }
+
+    /* A phone */
+    .phone { position: relative; width: 360px; max-width: 100%; height: 720px; border-radius: 28px; overflow: hidden; background: var(--cream); display: flex; flex-direction: column; box-shadow: 0 1px 0 var(--shadow), 0 14px 36px rgba(59, 42, 32, 0.14); }
+    .bar { display: flex; align-items: center; gap: 10px; padding: 12px 6px 12px 14px; background: var(--sand); }
+    .group-icon { flex: none; width: 42px; height: 42px; border-radius: 50%; background: var(--rust); color: var(--white); display: grid; place-items: center; }
+    .bar-title { flex: 1; min-width: 0; }
+    .bar-name { font-size: 18px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-members { font-size: 12.5px; color: var(--cocoa); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar .icon { width: 44px; height: 44px; display: grid; place-items: center; flex: none; }
+
+    .messages { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 12px; padding: 14px 14px 16px; }
+    .day { align-self: center; font-size: 12px; font-weight: 700; color: var(--cocoa); background: var(--sand); padding: 4px 12px; border-radius: 999px; }
+    .row { display: flex; align-items: flex-end; gap: 8px; }
+    .row.mine { justify-content: flex-end; }
+    .bubble { max-width: 262px; background: var(--white); border-radius: 18px 18px 18px 6px; padding: 8px 13px 9px; box-shadow: 0 1px 0 var(--shadow); font-size: 15.5px; line-height: 1.4; }
+    .mine .bubble { background: var(--blush); border-radius: 18px 18px 6px 18px; }
+    .sender { font-size: 13px; font-weight: 800; color: var(--brick); }
+    .post { width: 270px; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+    .post.judged { box-shadow: 0 0 0 2.5px var(--terracotta); }
+    .post-top { display: flex; justify-content: space-between; align-items: center; padding: 0 5px; }
+    .forwarded { display: flex; align-items: center; gap: 4px; font-size: 12px; font-style: italic; color: var(--cocoa); }
+    .preview { border-radius: 12px; overflow: hidden; background: var(--card); }
+    .preview-body { padding: 8px 10px 10px; display: flex; flex-direction: column; gap: 3px; }
+    .site { font-size: 12px; color: var(--muted); }
+    .headline { font-size: 16px; line-height: 1.25; }
+    .post-text { padding: 0 5px; }
+    .post-foot { display: flex; justify-content: space-between; align-items: center; padding: 0 5px 2px; }
+    .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; border-radius: 999px; padding: 3px 9px; }
+    .chip-blush { color: var(--brick); background: var(--blush); }
+    .time { font-size: 12px; color: var(--muted); }
+    .highlight { border-radius: 6px; box-shadow: 0 0 0 2.5px var(--terracotta); background: var(--white); }
+
+    /* Bottom panel and tray */
+    .panel { display: flex; flex-direction: column; gap: 10px; padding: 14px 14px 22px; background: var(--sand); border-radius: 22px 22px 0 0; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .panel-title { font-size: 17px; }
+    .hint { display: flex; align-items: center; gap: 4px; font-size: 12.5px; color: var(--cocoa); }
+    .verdicts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .verdict { height: 64px; border: 0; border-radius: 16px; font: inherit; font-weight: 800; font-size: 14.5px; line-height: 1.15; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 0 4px; text-align: center; }
+    .v-share { background: var(--sage); color: var(--white); }
+    .v-stop { background: var(--terracotta); color: var(--ink); }
+    .v-context { background: var(--marigold); color: var(--ink); }
+    .verdicts.chosen .verdict:not(.picked) { opacity: 0.35; }
+    .verdict.picked { box-shadow: 0 0 0 2.5px var(--white), 0 0 0 5px var(--ink); }
+
+    .tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .tool { min-height: 72px; border-radius: 16px; background: var(--white); box-shadow: 0 1px 0 var(--shadow); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 4px; text-align: center; font-size: 13px; font-weight: 800; line-height: 1.15; }
+    .tool.used { box-shadow: 0 0 0 2.5px var(--ink); }
+    .cost { display: inline-flex; align-items: center; gap: 2px; font-size: 11.5px; font-weight: 700; color: var(--cocoa); }
+    .zoom-card { background: var(--white); border-radius: 12px; padding: 12px; box-shadow: 0 1px 0 var(--shadow); }
+    .zoom-card .label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--cocoa); }
+    .zoom-address { margin-top: 8px; font-size: 24px; font-weight: 800; letter-spacing: .01em; overflow-wrap: anywhere; }
+    .zoom-address .off { background: var(--blush); color: var(--brick); border-radius: 6px; padding: 0 3px; }
+    .zoom-fine { margin-top: 6px; font-size: 12px; color: var(--muted); }
+    .spread { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: var(--brick); }
+
+    .clues { display: flex; flex-wrap: wrap; gap: 8px; }
+    .clue { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; border-radius: 999px; background: var(--white); box-shadow: 0 1px 0 var(--shadow); font-weight: 700; font-size: 14px; }
+    .clue.picked { box-shadow: 0 0 0 2.5px var(--ink); font-weight: 800; }
+    .primary { min-height: 52px; border: 0; border-radius: 16px; background: var(--rust); color: var(--white); font: inherit; font-weight: 800; font-size: 15.5px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; padding: 3px; background: var(--cream); border-radius: 999px; }
+    .tabs span { min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 999px; font-size: 13px; font-weight: 700; text-align: center; padding: 0 8px; line-height: 1.15; }
+    .tabs .on { background: var(--white); font-weight: 800; box-shadow: 0 1px 0 var(--shadow); }
+    .reply-options { display: flex; flex-direction: column; gap: 8px; }
+    .reply-option { display: flex; gap: 10px; align-items: flex-start; background: var(--white); border-radius: 16px; padding: 10px 12px; box-shadow: 0 1px 0 var(--shadow); font-size: 14px; line-height: 1.35; }
+    .reply-option .dot { flex: none; width: 20px; height: 20px; margin-top: 1px; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--cocoa); display: grid; place-items: center; }
+    .reply-option.picked { box-shadow: 0 0 0 2.5px var(--ink); }
+    .reply-option.picked .dot { background: var(--ink); color: var(--white); box-shadow: none; }
+
+    .system { align-self: center; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: var(--cocoa); background: var(--sand); border-radius: 999px; padding: 5px 12px; text-align: center; }
+    .meter { display: flex; flex-direction: column; gap: 6px; background: var(--white); border-radius: 16px; padding: 10px 12px; box-shadow: 0 1px 0 var(--shadow); }
+    .meter-row { display: flex; justify-content: space-between; font-size: 13px; font-weight: 800; }
+    .meter-track { height: 10px; border-radius: 999px; background: var(--sand); overflow: hidden; }
+    .meter-fill { height: 100%; border-radius: 999px; background: var(--sage); }
+
+    /* The computer layout */
+    .desktop-step { width: 100%; max-width: 1148px; }
+    .desktop-scroll { overflow-x: auto; padding-bottom: 8px; }
+    .desktop { width: 1100px; height: 640px; border-radius: 20px; overflow: hidden; background: var(--cream); display: grid; grid-template-columns: 260px 1fr 300px; grid-template-rows: minmax(0, 1fr); box-shadow: 0 1px 0 var(--shadow), 0 14px 36px rgba(59, 42, 32, 0.14); }
+    .list { background: var(--sand); padding: 14px 10px; display: flex; flex-direction: column; gap: 6px; }
+    .list-title { font-size: 18px; padding: 4px 8px 8px; }
+    .chat-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 16px; min-height: 56px; }
+    .chat-item.on { background: var(--white); box-shadow: 0 1px 0 var(--shadow); }
+    .chat-item .group-icon { width: 38px; height: 38px; }
+    .chat-item .locked { background: var(--muted); }
+    .chat-item .t { font-weight: 800; font-size: 13.5px; line-height: 1.25; }
+    .chat-item .s { font-size: 12px; color: var(--muted); }
+    .middle { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+    .side { background: var(--sand); padding: 14px; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+    .rule { background: var(--white); border-radius: 12px; padding: 12px; box-shadow: 0 1px 0 var(--shadow); font-size: 14px; line-height: 1.4; }
+    .rule h3 { margin: 0 0 4px; font-size: 16px; }
+    .rule .kicker { font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+
+    @media (max-width: 400px) {
+      .phone { height: 700px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-head">
+    <div>
+      <h1 class="display" id="title"></h1>
+      <p id="intro"></p>
+    </div>
+    <div class="switch" role="group" aria-label="Language">
+      <button type="button" data-lang="en" lang="en">EN</button>
+      <button type="button" data-lang="pt-BR" lang="pt-BR">PT-BR</button>
+    </div>
+  </div>
+  <div class="steps" id="steps"></div>
+
+  <script src="../characters.js"></script>
+  <script src="../posts/family.js"></script>
+  <script>
+    // Texts for this sketch only. The Portuguese names for the verdicts, tools
+    // and tricks aren't in the GDD yet, so these are placeholders to decide.
+    var T = {
+      en: {
+        title: "Chat screen sketch",
+        intro: "Cousin Nina's first post through the whole loop, at phone size, then the computer layout. It's a sketch: only the language switch works.",
+        steps: [
+          ["A post arrives", "The post being judged gets the terracotta ring. The verdict buttons wait at the bottom, within thumb reach."],
+          ["Check it", "Tapping the post opens the tool tray. Zoom is free; the other tools cost a tick, and the post keeps spreading while you check."],
+          ["Call it, then point to the proof", "After Stop or Needs context, you point at what gave it away. Guessing right isn't enough for full points."],
+          ["Reply", "Reply in the group or message Nina privately. The same words land differently with different people."],
+          ["See what happens", "Nina's face and words show how your reply landed. Her trust in you and the post's spread change."],
+          ["On a computer", "Chat list on the left, the open chat in the middle, tools and the rulebook on the right, so nothing needs a drawer."]
+        ],
+        group: "Family 🙏 (NO politics!!)",
+        members: "Grandpa Jorge, Cousin Nina, Mom, Aunt Rosa, you",
+        today: "Today",
+        rosa: "Aunt Rosa", rosaSays: "Good morning, everyone! Sunday lunch at my place?",
+        mom: "Mom", momSays: "I'll make the potato salad 😄",
+        nina: "Cousin Nina", ninaShort: "Nina",
+        forwarded: "Forwarded", forwardedTimes: "Forwarded {n} times",
+        yourCall: "Nina's post: your call?", tapToCheck: "Tap it to check",
+        share: "Share", stop: "Stop", context: "Needs context",
+        zoom: "Zoom", sourceCard: "Source card", openArticle: "Open the article", free: "free",
+        spread: "Spreading: {n} people have seen it",
+        giveaway: "What gave it away?", clueAddress: "The address", clueFine: "The fine print", clueHeadline: "The headline", cluePhoto: "The photo",
+        thatsIt: "That's it",
+        inGroup: "Reply in group", privately: "Message Nina privately", send: "Send",
+        privateChat: "Private chat",
+        ninaAnswers: "omg you're right 😳 deleting it now. thanks for telling me here and not in the group!!",
+        deleted: "Nina deleted her post in Family",
+        trust: "Nina's trust in you", trustUp: "+15",
+        stopped: "Spread stopped at 14 people",
+        chats: "Chats",
+        friends: "Bad Decisions Club 🍕", school: "8B Official 📚", work: "Team Sync 🚀", later: "Unlocks later",
+        rulebook: "Rulebook", rulePage: "Page 1",
+        ruleTitle: "Lookalike address",
+        ruleText: "A copycat site borrows a name you trust. Zoom in and read the address all the way to the end: the real site's name comes right before .com, .gov or .com.br.",
+        tools: "Tools"
+      },
+      "pt-BR": {
+        title: "Esboço da tela do chat",
+        intro: "O primeiro post da Prima Nina pelo ciclo inteiro, no tamanho do celular, e depois o layout no computador. É um esboço: só a troca de idioma funciona.",
+        steps: [
+          ["Chega um post", "O post em julgamento ganha o contorno terracota. Os botões de veredito ficam embaixo, ao alcance do polegar."],
+          ["Confere", "Tocar no post abre a bandeja de ferramentas. O zoom é grátis; as outras custam um tique, e o post continua se espalhando enquanto você confere."],
+          ["Decide e mostra a prova", "Depois de Barrar ou Falta contexto, você aponta o que entregou o golpe. Acertar no chute não vale a pontuação toda."],
+          ["Responde", "Responde no grupo ou chama a Nina no privado. As mesmas palavras caem diferente pra cada pessoa."],
+          ["Vê o que acontece", "A cara e a resposta da Nina mostram como sua mensagem foi recebida. A confiança dela em você e o alcance do post mudam."],
+          ["No computador", "Lista de conversas à esquerda, o chat no meio, ferramentas e manual à direita, sem nada escondido em gaveta."]
+        ],
+        group: "Família Unida ❤️🙏",
+        members: "Vô Jorge, Prima Nina, Mãe, Tia Rosa, você",
+        today: "Hoje",
+        rosa: "Tia Rosa", rosaSays: "Bom dia, família! Almoço de domingo lá em casa?",
+        mom: "Mãe", momSays: "Eu levo a farofa 😄",
+        nina: "Prima Nina", ninaShort: "Nina",
+        forwarded: "Encaminhada", forwardedTimes: "Encaminhada {n} vezes",
+        yourCall: "Post da Nina: qual seu veredito?", tapToCheck: "Toque pra conferir",
+        share: "Compartilhar", stop: "Barrar", context: "Falta contexto",
+        zoom: "Zoom", sourceCard: "Ver a fonte", openArticle: "Abrir a matéria", free: "grátis",
+        spread: "Espalhando: {n} pessoas já viram",
+        giveaway: "O que entregou?", clueAddress: "O endereço", clueFine: "As letras miúdas", clueHeadline: "A manchete", cluePhoto: "A foto",
+        thatsIt: "É isso",
+        inGroup: "Responder no grupo", privately: "Chamar a Nina no privado", send: "Enviar",
+        privateChat: "Conversa privada",
+        ninaAnswers: "mds você tem razão 😳 já apaguei. valeu por me avisar aqui e não no grupo!!",
+        deleted: "Nina apagou o post na Família",
+        trust: "Confiança da Nina em você", trustUp: "+15",
+        stopped: "O post parou em 14 pessoas",
+        chats: "Conversas",
+        friends: "Os Sem Noção 🤪", school: "8º B Oficial 📚", work: "Equipe 🚀", later: "Libera depois",
+        rulebook: "Manual", rulePage: "Página 1",
+        ruleTitle: "Endereço parecido",
+        ruleText: "Site cópia usa um nome em que você confia. Dá zoom e lê o endereço até o fim: o nome do site de verdade vem logo antes do .com, .gov ou .com.br.",
+        tools: "Ferramentas"
+      }
+    };
+
+    var post = window.POSTS.filter(function (p) { return p.id === "family-01"; })[0];
+    var language = "en";
+
+    function ic(paths, size, width) {
+      return '<svg width="' + (size || 22) + '" height="' + (size || 22) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' +
+        (width || 2.2) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths + "</svg>";
+    }
+    var I = {
+      house: '<path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z"/>',
+      gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+      back: '<path d="M15 5l-7 7 7 7"/>',
+      forward: '<path d="M14 6l6 6-6 6"/><path d="M20 12H10a6 6 0 0 0-6 6"/>',
+      spread: '<path d="M4 17l6-6 4 4 6-6"/><path d="M15 9h5v5"/>',
+      zoom: '<circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/>',
+      person: '<circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+      article: '<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7M9 8h3"/>',
+      clock: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
+      share: '<path d="M12 4v11"/><path d="M7 9l5-5 5 5"/><path d="M5 14v5h14v-5"/>',
+      stop: '<path d="M8.5 3h7L21 8.5v7L15.5 21h-7L3 15.5v-7z"/><path d="M8 12h8"/>',
+      context: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><path d="M12 7.5v.01"/>',
+      check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+      send: '<path d="M4 12l16-8-6 16-3-7z"/>',
+      lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+      trash: '<path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/>',
+      up: '<path d="M12 19V5"/><path d="M6 11l6-6 6 6"/>',
+      book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/>'
+    };
+
+    function fill(text, n) { return text.replace("{n}", n); }
+
+    function esc(text) {
+      return String(text).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; });
+    }
+
+    // A flat illustration for the link preview: a gift box with a gift card
+    var GIFT = '<svg width="254" height="104" viewBox="0 0 254 104" aria-hidden="true" style="display:block">' +
+      '<rect width="254" height="104" fill="#F6D27A"/>' +
+      '<rect x="92" y="40" width="70" height="50" rx="6" fill="#E07A55"/>' +
+      '<rect x="86" y="30" width="82" height="16" rx="5" fill="#B4472A"/>' +
+      '<rect x="122" y="30" width="10" height="60" fill="#FBF3E6"/>' +
+      '<path d="M127 30c-8-12-22-12-20-3 1 5 12 4 20 3zM127 30c8-12 22-12 20-3-1 5-12 4-20 3z" fill="#FBF3E6"/>' +
+      '<rect x="168" y="22" width="56" height="36" rx="6" fill="#FBF3E6" transform="rotate(12 196 40)"/>' +
+      '<rect x="176" y="34" width="26" height="5" rx="2.5" fill="#F2B33D" transform="rotate(12 196 40)"/>' +
+      '<circle cx="48" cy="26" r="4" fill="#FBF3E6"/><circle cx="66" cy="70" r="3" fill="#FBF3E6"/><circle cx="214" cy="80" r="3.5" fill="#FBF3E6"/>' +
+      "</svg>";
+
+    function header(t) {
+      return '<div class="bar"><div class="group-icon">' + ic(I.house) + "</div>" +
+        '<div class="bar-title"><div class="bar-name display">' + esc(t.group) + "</div>" +
+        '<div class="bar-members">' + esc(t.members) + "</div></div>" +
+        '<div class="icon">' + ic(I.gear) + "</div></div>";
+    }
+
+    function row(id, face, name, text) {
+      return '<div class="row">' + Characters.avatar(id, face, 44) +
+        '<div class="bubble"><div class="sender">' + esc(name) + "</div>" + esc(text) + "</div></div>";
+    }
+
+    // Nina's post as it lands in the chat; `address` swaps in a highlighted address
+    function ninaPost(t, opts) {
+      var p = post.text[language];
+      return '<div class="row">' + Characters.avatar("nina", "neutral", 44) +
+        '<div class="bubble post' + (opts.judged ? " judged" : "") + '">' +
+        '<div class="post-top"><div class="sender">' + esc(t.nina) + '</div><div class="forwarded">' + ic(I.forward, 14) + esc(t.forwarded) + "</div></div>" +
+        '<div class="preview">' + GIFT + '<div class="preview-body">' +
+        '<div class="site"><span class="' + (opts.highlightAddress ? "highlight" : "") + '">' + esc(p.source.url) + "</span></div>" +
+        '<div class="headline display">' + esc(p.headline) + "</div></div></div>" +
+        '<div class="post-text">' + esc(p.message) + "</div>" +
+        '<div class="post-foot"><span class="chip chip-blush">' + ic(I.spread, 13, 2.4) + esc(fill(t.forwardedTimes, opts.forwards)) + '</span><span class="time">8:14</span></div>' +
+        "</div></div>";
+    }
+
+    function chatTop(t) {
+      return '<div class="day">' + esc(t.today) + "</div>" +
+        row("rosa", "neutral", t.rosa, t.rosaSays) +
+        row("mom", "neutral", t.mom, t.momSays);
+    }
+
+    function verdicts(t, picked) {
+      var b = function (cls, key, icon) {
+        return '<div class="verdict ' + cls + (picked === key ? " picked" : "") + '">' + ic(icon) + esc(t[key]) + "</div>";
+      };
+      return '<div class="verdicts' + (picked ? " chosen" : "") + '">' + b("v-share", "share", I.share) + b("v-stop", "stop", I.stop) + b("v-context", "context", I.context) + "</div>";
+    }
+
+    function phone(inner) { return '<div class="phone">' + inner + "</div>"; }
+
+    function step(n, t, body, wide) {
+      var s = t.steps[n - 1];
+      return '<section class="step' + (wide ? " desktop-step" : "") + '"><div class="step-label"><div class="step-num">' + n + "</div><div>" +
+        '<h2 class="display">' + esc(s[0]) + "</h2><p>" + esc(s[1]) + "</p></div></div>" + body + "</section>";
+    }
+
+    function addressParts(url) {
+      // Marks the part that gives the copycat away: everything after the store's name
+      var cut = url.indexOf("-");
+      return esc(url.slice(0, cut)) + '<span class="off">' + esc(url.slice(cut)) + "</span>";
+    }
+
+    function render() {
+      var t = T[language];
+      var p = post.text[language];
+      document.documentElement.lang = language;
+      document.title = t.title;
+      document.getElementById("title").textContent = t.title;
+      document.getElementById("intro").textContent = t.intro;
+      document.querySelectorAll(".switch button").forEach(function (b) {
+        b.setAttribute("aria-pressed", String(b.dataset.lang === language));
+      });
+
+      var s1 = phone(header(t) +
+        '<div class="messages">' + chatTop(t) + ninaPost(t, { judged: true, forwards: 12 }) + "</div>" +
+        '<div class="panel"><div class="panel-head"><div class="panel-title display">' + esc(t.yourCall) + "</div>" +
+        '<div class="hint">' + ic(I.zoom, 15) + esc(t.tapToCheck) + "</div></div>" + verdicts(t) + "</div>");
+
+      var s2 = phone(header(t) +
+        '<div class="messages">' + ninaPost(t, { judged: true, forwards: 12, highlightAddress: true }) + "</div>" +
+        '<div class="panel">' +
+        '<div class="zoom-card"><div class="label">' + ic(I.zoom, 14) + esc(t.zoom) + "</div>" +
+        '<div class="zoom-address">' + addressParts(p.source.url) + "</div>" +
+        '<div class="zoom-fine">' + esc(p.finePrint) + "</div></div>" +
+        '<div class="spread">' + ic(I.spread, 15, 2.4) + esc(fill(t.spread, 12)) + "</div>" +
+        '<div class="tools">' +
+        '<div class="tool used">' + ic(I.zoom) + esc(t.zoom) + '<span class="cost">' + esc(t.free) + "</span></div>" +
+        '<div class="tool">' + ic(I.person) + esc(t.sourceCard) + '<span class="cost">' + ic(I.clock, 12) + "+1</span></div>" +
+        '<div class="tool">' + ic(I.article) + esc(t.openArticle) + '<span class="cost">' + ic(I.clock, 12) + "+1</span></div>" +
+        "</div></div>");
+
+      var s3 = phone(header(t) +
+        '<div class="messages">' + ninaPost(t, { judged: true, forwards: 14, highlightAddress: true }) + "</div>" +
+        '<div class="panel">' + verdicts(t, "stop") +
+        '<div class="panel-title display">' + esc(t.giveaway) + "</div>" +
+        '<div class="clues">' +
+        '<span class="clue picked">' + ic(I.check, 16) + esc(t.clueAddress) + "</span>" +
+        '<span class="clue">' + esc(t.clueFine) + "</span>" +
+        '<span class="clue">' + esc(t.clueHeadline) + "</span>" +
+        '<span class="clue">' + esc(t.cluePhoto) + "</span></div>" +
+        '<div class="primary">' + ic(I.check, 18) + esc(t.thatsIt) + "</div></div>");
+
+      var s4 = phone(header(t) +
+        '<div class="messages">' + ninaPost(t, { judged: true, forwards: 14 }) + "</div>" +
+        '<div class="panel">' +
+        '<div class="tabs"><span>' + esc(t.inGroup) + '</span><span class="on">' + ic(I.check, 14) + esc(t.privately) + "</span></div>" +
+        '<div class="reply-options">' + post.replies.map(function (r, i) {
+          return '<div class="reply-option' + (i === 0 ? " picked" : "") + '"><span class="dot">' + (i === 0 ? ic(I.check, 13, 3) : "") + "</span><span>" + esc(r[language]) + "</span></div>";
+        }).join("") + "</div>" +
+        '<div class="primary">' + ic(I.send, 18) + esc(t.send) + "</div></div>");
+
+      var s5 = phone('<div class="bar"><div class="icon">' + ic(I.back) + "</div>" + Characters.avatar("nina", "relieved", 42) +
+        '<div class="bar-title"><div class="bar-name display">' + esc(t.ninaShort) + '</div><div class="bar-members">' + esc(t.privateChat) + "</div></div></div>" +
+        '<div class="messages">' +
+        '<div class="row mine"><div class="bubble">' + esc(post.replies[0][language]) + "</div></div>" +
+        '<div class="row">' + Characters.avatar("nina", "relieved", 44) + '<div class="bubble">' + esc(t.ninaAnswers) + "</div></div>" +
+        '<div class="system">' + ic(I.trash, 15) + esc(t.deleted) + "</div>" +
+        '<div class="system">' + ic(I.stop, 15) + esc(t.stopped) + "</div>" +
+        '<div class="meter"><div class="meter-row"><span>' + esc(t.trust) + '</span><span>' + ic(I.up, 13, 2.6) + " " + esc(t.trustUp) + "</span></div>" +
+        '<div class="meter-track"><div class="meter-fill" style="width:65%"></div></div></div>' +
+        "</div>");
+
+      var desktop = '<div class="desktop-scroll"><div class="desktop">' +
+        '<div class="list"><div class="list-title display">' + esc(t.chats) + "</div>" +
+        '<div class="chat-item on"><div class="group-icon">' + ic(I.house, 20) + '</div><div><div class="t">' + esc(t.group) + '</div><div class="s">' + esc(t.nina) + ": " + esc(p.headline) + "</div></div></div>" +
+        [t.friends, t.school, t.work].map(function (name) {
+          return '<div class="chat-item"><div class="group-icon locked">' + ic(I.lock, 18) + '</div><div><div class="t">' + esc(name) + '</div><div class="s">' + esc(t.later) + "</div></div></div>";
+        }).join("") + "</div>" +
+        '<div class="middle">' + header(t) + '<div class="messages">' + chatTop(t) + ninaPost(t, { judged: true, forwards: 12, highlightAddress: true }) + "</div>" +
+        '<div class="panel"><div class="panel-head"><div class="panel-title display">' + esc(t.yourCall) + "</div></div>" + verdicts(t) + "</div></div>" +
+        '<div class="side"><div class="panel-title display">' + esc(t.tools) + "</div>" +
+        '<div class="zoom-card"><div class="label">' + ic(I.zoom, 14) + esc(t.zoom) + '</div><div class="zoom-address">' + addressParts(p.source.url) + '</div><div class="zoom-fine">' + esc(p.finePrint) + "</div></div>" +
+        '<div class="tools"><div class="tool used">' + ic(I.zoom) + esc(t.zoom) + '</div><div class="tool">' + ic(I.person) + esc(t.sourceCard) + '</div><div class="tool">' + ic(I.article) + esc(t.openArticle) + "</div></div>" +
+        '<div class="panel-title display">' + ic(I.book, 18) + " " + esc(t.rulebook) + "</div>" +
+        '<div class="rule"><div class="kicker">' + esc(t.rulePage) + '</div><h3 class="display">' + esc(t.ruleTitle) + "</h3>" + esc(t.ruleText) + "</div>" +
+        "</div></div></div>";
+
+      document.getElementById("steps").innerHTML =
+        step(1, t, s1) + step(2, t, s2) + step(3, t, s3) + step(4, t, s4) + step(5, t, s5) + step(6, t, desktop, true);
+    }
+
+    document.querySelectorAll(".switch button").forEach(function (b) {
+      b.addEventListener("click", function () { language = b.dataset.lang; render(); });
+    });
+    render();
+  </script>
+</body>
+</html>
