@@ -21,7 +21,12 @@ A mobile-first web game about spotting misinformation in group chats.
   - posts live in `.js` files, keeping the record shape from the GDD's
     "Content rules and post format".
 - Every text in the game exists in English and Brazilian Portuguese, in two
-  language files (one per language). No player-facing text in the code.
+  language files: `lang/en.js` and `lang/pt-BR.js`, with the same names in
+  both. No player-facing text in the code.
+- Files: `index.html` (the page), `style.css` (colours at the top),
+  `game.js` (the code), `lang/` (texts).
+- The language switch is remembered in the browser. On a first visit, phones
+  set to Portuguese start in PT-BR and everything else in English.
 - Every number from the GDD (scores, weights, trust, spread) lives in one
   settings file that Victor can read and edit. No numbers in the code.
 - Mobile first: design for a phone held in one hand, with the main buttons
