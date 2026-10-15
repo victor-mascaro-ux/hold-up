@@ -39,14 +39,30 @@
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           <span data-text="startOver"></span>
         </button>
+        <!-- For building and testing only: take it out before strangers playtest -->
+        <div class="test-menu">
+          <div class="menu-label" data-text="test"></div>
+          <div class="menu-row">
+            <span class="menu-row-name" data-text="jumpToPost"></span>
+            <div class="pills" id="jump-buttons"></div>
+          </div>
+          <div class="menu-row">
+            <span class="menu-row-name" data-text="language"></span>
+            <div class="pills" id="language-buttons"></div>
+          </div>
+        </div>
       </div>
     </header>
-    <main class="chat-messages" data-label="messagesName"></main>
+    <main class="chat-messages" id="messages" data-label="messagesName"></main>
+    <section class="panel" id="panel" aria-live="polite" hidden></section>
   </div>
 
+  <script src="settings.js"></script>
   <script src="lang/en.js"></script>
   <script src="lang/pt-BR.js"></script>
   <script src="characters.js"></script>
+  <script src="illustrations.js"></script>
+  <script src="posts/family.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

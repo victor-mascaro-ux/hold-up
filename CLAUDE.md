@@ -25,7 +25,8 @@ A mobile-first web game about spotting misinformation in group chats.
   language files: `lang/en.js` and `lang/pt-BR.js`, with the same names in
   both. No player-facing text in the code.
 - Files: `index.html` (the page), `style.css` (colours at the top, named as in
-  ART.md), `game.js` (the code), `lang/` (texts), `characters.js` (the cast,
+  ART.md), `game.js` (the code), `lang/` (texts), `settings.js` (every
+  number), `illustrations.js` (flat pictures for posts), `characters.js` (the cast,
   one SVG per character with a face setting), `fonts/fonts.css` (Fredoka and
   Nunito, embedded so they work offline), `art/` (reference, cast sheet and
   `sketch.html`, the chat screen sketch), `posts/` (`family.js` holds the
@@ -54,6 +55,18 @@ A mobile-first web game about spotting misinformation in group chats.
 - Mobile first: design for a phone held in one hand, with the main buttons
   within thumb reach.
 - No accounts, no tracking, no server. Saving progress in the browser is fine.
+
+## Decisions the GDD doesn't cover (Victor's answers)
+
+- Portuguese verdict names: Compartilhar / Barrar / Falta contexto.
+- Only the exact verdict counts as right (Stop on a Needs context post is wrong,
+  and the other way round).
+- "typing…" lasts `typingSeconds` in settings.js (1.5 s to start).
+- The messenger's own name is still to be decided; nothing shows it yet.
+- The settings card's Test section (jump to a post, switch language) is for
+  building only: take it out before strangers playtest.
+- Still open: how replies to true posts are scored (the GDD's R table was made
+  for corrections).
 
 ## Victor's commands
 

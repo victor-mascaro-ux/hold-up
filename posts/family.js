@@ -116,7 +116,7 @@ window.POSTS.push(
     evidence: ["source.about"],
     severity: 2,
     source: { ageDays: 6, followers: 312, posts: 9 },
-    image: { art: "tv-doctor-photo" },
+    image: { art: "tv-doctor", avatar: "tv-doctor-avatar" },
     date: "2026-10-15",
     text: {
       en: {
@@ -124,7 +124,7 @@ window.POSTS.push(
         source: {
           name: "Dr. Ray Holloway ✔",
           url: "@dr.rayholloway.health",
-          about: "Account created 6 days ago · 312 followers. The blue check is drawn into the profile picture; it isn't a real badge. All 9 posts are the same ad. The real Dr. Ray Holloway (@drrayholloway, 2.1M followers) has said he never sells products."
+          about: "Account created 6 days ago · 312 followers. The check mark is drawn into the profile picture; it isn't a real badge. All 9 posts are the same ad. The real Dr. Ray Holloway (@drrayholloway, 2.1M followers) has said he never sells products."
         },
         headline: "I'm retiring, so I'm sharing my secret: Kneevana capsules end joint pain in 7 days. The pharmacies don't want you to know! Only 50 boxes left 👇 kneevana-official.shop",
         finePrint: "",
@@ -135,7 +135,7 @@ window.POSTS.push(
         source: {
           name: "Dr. Heitor Lessa ✔",
           url: "@dr.heitorlessa.saude",
-          about: "Conta criada há 6 dias · 312 seguidores. O selo azul é um desenho na foto de perfil, não é selo de verdade. Os 9 posts são o mesmo anúncio. O Dr. Heitor Lessa de verdade (@drheitorlessa, 3,4 mi de seguidores) já avisou que não vende produto nenhum."
+          about: "Conta criada há 6 dias · 312 seguidores. O selo de verificado é um desenho na foto de perfil, não é selo de verdade. Os 9 posts são o mesmo anúncio. O Dr. Heitor Lessa de verdade (@drheitorlessa, 3,4 mi de seguidores) já avisou que não vende produto nenhum."
         },
         headline: "Vou me aposentar e resolvi contar meu segredo: as cápsulas Joelhix acabam com a dor nas juntas em 7 dias. As farmácias não querem que você saiba! Últimas 50 caixas 👇 joelhix-oficial.shop",
         finePrint: "",
