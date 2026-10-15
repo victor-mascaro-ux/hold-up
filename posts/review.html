@@ -85,6 +85,8 @@
     .explain { margin: 0; }
 
     .replies { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .reply-set { margin: 12px 0 6px; font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+    .reply-set:first-child { margin-top: 0; }
     .reply { background: var(--white); border-radius: 18px 18px 6px 18px; padding: 8px 12px 10px; box-shadow: 0 1px 0 var(--shadow); }
     .reply .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
 
@@ -110,7 +112,7 @@
   <div class="page">
     <div class="intro">
       <h1>Family posts: review</h1>
-      <p>Each post as it looks in the chat, in English and Portuguese side by side, with the right answer, what the checking tools show, the three replies, the real hoax it's based on, and what was fact-checked. Every FACT-CHECK below was checked against the sources listed; read them, and tell me what to change. Once you're happy, the marks come off.</p>
+      <p>Each post as it looks in the chat, in English and Portuguese side by side, with the right answer, what the checking tools show, the replies (correcting or agreeing, in the group or in private), the real hoax it's based on, and what was fact-checked. Every FACT-CHECK below was checked against the sources listed; read them, and tell me what to change. Once you're happy, the marks come off.</p>
       <ul class="summary" id="summary"></ul>
     </div>
     <div id="posts"></div>
@@ -216,12 +218,23 @@
       return '<span class="chip chip-blush">' + icon(ICONS.warn) + "Wrong reason: " + esc(TRICKS[cites]) + "</span>";
     }
 
+    // Replies come in four sets: correcting (after Stop or Needs context) or
+    // agreeing (after Share), each in the group or in private
+    var REPLY_SETS = [
+      ["stop", "group", "After Stop or Needs context · in the group"],
+      ["stop", "private", "After Stop or Needs context · in private"],
+      ["share", "group", "After Share · in the group"],
+      ["share", "private", "After Share · in private"]
+    ];
+
     function replies(post, language) {
-      return '<ul class="replies">' + post.replies.map(function (reply) {
-        return '<li class="reply"><div>' + esc(reply[language]) + '</div><div class="tags">' +
-          reply.features.map(function (f) { return '<span class="chip chip-plain">' + FEATURES[f] + "</span>"; }).join("") +
-          citeTag(post, reply.cites) + "</div></li>";
-      }).join("") + "</ul>";
+      return REPLY_SETS.map(function (set) {
+        return '<h4 class="reply-set">' + set[2] + '</h4><ul class="replies">' + post.replies[set[0]][set[1]].map(function (reply) {
+          return '<li class="reply"><div>' + esc(reply[language]) + '</div><div class="tags">' +
+            reply.features.map(function (f) { return '<span class="chip chip-plain">' + FEATURES[f] + "</span>"; }).join("") +
+            citeTag(post, reply.cites) + "</div></li>";
+        }).join("") + "</ul>";
+      }).join("");
     }
 
     function languageColumn(post, language) {

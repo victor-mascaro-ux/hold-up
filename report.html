@@ -58,6 +58,14 @@
     .rules li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; box-shadow: inset 0 -1px 0 var(--shadow); }
     .rules b { white-space: nowrap; }
 
+    .post-replies { margin-bottom: 18px; }
+    .post-replies h3 { font-family: "Fredoka", "Nunito", sans-serif; font-weight: 600; font-size: 16px; margin: 0 0 8px; }
+    .replies-table { min-width: 860px; }
+    .replies-table td.words { width: 38%; }
+    .stance td { background: var(--cream); font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+    .win { font-weight: 800; }
+    .example { min-width: 560px; }
+
     @media (max-width: 640px) {
       .totals { grid-template-columns: minmax(0, 1fr); }
       .rules { grid-template-columns: minmax(0, 1fr); }
@@ -76,6 +84,17 @@
       <thead><tr><th>#</th><th>Post</th><th>Right answer</th><th>Share everything</th><th>Stop everything</th><th>Perfect play</th></tr></thead>
       <tbody id="rows"></tbody>
       <tfoot><tr id="foot"></tr></tfoot>
+    </table></div>
+
+    <h2>Replies: who takes what well</h2>
+    <p class="intro">Every reply on every post, scored for Cousin Nina and for Grandpa Jorge, each at trust 50 (so the trust bonus is 0). A reply that names the post's real trick earns the +2 proof points; one that names the wrong reason gets −3. ★ marks the reply that scores the highest R for each person after each verdict.</p>
+    <div id="replies"></div>
+
+    <h2>Check against the GDD's Example</h2>
+    <p class="intro">The GDD's "Example" table, worked out again with this game's rules and numbers. Everyone at trust 50; "sourced" replies name the trick.</p>
+    <div class="table-wrap"><table class="example">
+      <thead><tr><th>Reply</th><th>Person</th><th>GDD says</th><th>The game gets</th><th></th></tr></thead>
+      <tbody id="example"></tbody>
     </table></div>
 
     <h2>The numbers in settings.js</h2>
@@ -161,6 +180,78 @@
 
     document.getElementById("totals").innerHTML = STRATEGIES.map(function (s) {
       return '<div class="total"><div class="name">' + s[1] + '</div><div class="points">' + signed(totals[s[0]]) + "</div></div>";
+    }).join("");
+
+    // ---------------------------------------------------------------- replies
+
+    var PEOPLE = [["nina", "Cousin Nina"], ["jorge", "Grandpa Jorge"]];
+    var REACTIONS = { accepts: "accepts", stung: "stung", ignores: "ignores", digsIn: "digs in" };
+    var FEATURE_NAMES = {
+      empathy: "empathy", source: "source", joke: "joke", short: "short",
+      question: "question", trueAlternative: "true alternative"
+    };
+    var START = window.SETTINGS.trustStart;
+
+    function replyTags(post, reply) {
+      var names = reply.features.map(function (f) { return FEATURE_NAMES[f]; });
+      var cite = !reply.cites ? "names nothing"
+        : post.tricks.indexOf(reply.cites) !== -1 ? "names the trick"
+        : "wrong reason (" + reply.cites.replace(/-/g, " ") + ")";
+      return names.join(", ") + " · " + cite;
+    }
+
+    function stanceRows(post, stance, label) {
+      var options = Scoring.replyOptions(post, stance);
+      // Score every option for each person, then find each person's best R
+      var scored = options.map(function (o) {
+        var row = { o: o };
+        PEOPLE.forEach(function (p) { row[p[0]] = Scoring.answer(post, o.reply, stance, o.channel, p[0], START); });
+        return row;
+      });
+      var best = {};
+      PEOPLE.forEach(function (p) {
+        best[p[0]] = Math.max.apply(null, scored.map(function (row) { return row[p[0]].R.total; }));
+      });
+      return '<tr class="stance"><td colspan="4">' + label + "</td></tr>" + scored.map(function (row) {
+        return "<tr><td>" + (row.o.channel === "group" ? "Group" : "Private") + "</td>" +
+          '<td class="words">' + esc(row.o.reply.en) + '<div class="note">' + esc(replyTags(post, row.o.reply)) + "</div></td>" +
+          PEOPLE.map(function (p) {
+            var a = row[p[0]];
+            var win = a.R.total === best[p[0]];
+            return '<td class="' + (win ? "win" : "") + '">' + (win ? "★ " : "") + "R " + signed(a.R.total) +
+              '<div class="note">' + REACTIONS[a.reaction] + ", trust " + signed(a.trustAfter - a.trustBefore) + "</div></td>";
+          }).join("") + "</tr>";
+      }).join("");
+    }
+
+    document.getElementById("replies").innerHTML = window.POSTS.map(function (post, i) {
+      return '<div class="post-replies"><h3>' + (i + 1) + ". " + esc(post.text.en.headline.length > 70 ? post.text.en.headline.slice(0, 68) + "…" : post.text.en.headline) + " " + verdictChip(post.verdict) + "</h3>" +
+        '<div class="table-wrap"><table class="replies-table"><thead><tr><th>Where</th><th>Reply</th>' +
+        PEOPLE.map(function (p) { return "<th>To " + p[1] + (p[0] === post.sender ? " (posted it)" : "") + "</th>"; }).join("") +
+        "</tr></thead><tbody>" +
+        stanceRows(post, "stop", "After Stop or Needs context: correcting it") +
+        stanceRows(post, "share", "After Share: agreeing with it") +
+        "</tbody></table></div></div>";
+    }).join("");
+
+    // ---------------------------------------------------------------- the GDD's Example
+
+    // The GDD's four people for its Example, and its replies, as plays
+    var EXAMPLE_POST = { verdict: "stop", tricks: ["the-trick"] };
+    var EXAMPLE = [
+      ["Kind & private", { features: ["empathy", "source"], cites: "the-trick" }, "private", { nina: 5, jorge: 6, duda: 5, leo: 1, paulo: 6 }],
+      ["Joke", { features: ["joke", "short"], cites: null }, "group", { nina: 1, jorge: -2, duda: 0, leo: 5, paulo: 1 }],
+      ["Firm & public", { features: ["short", "source"], cites: "the-trick" }, "group", { nina: 2, jorge: 4, duda: 3, leo: 4, paulo: 6 }]
+    ];
+    var EXAMPLE_PEOPLE = { nina: "Nina", jorge: "Vô Jorge", duda: "Duda", leo: "Leo", paulo: "Sr. Paulo (manager)" };
+
+    document.getElementById("example").innerHTML = EXAMPLE.map(function (ex) {
+      return Object.keys(ex[3]).map(function (person) {
+        var got = Scoring.answer(EXAMPLE_POST, ex[1], "stop", ex[2], person, START).R.total;
+        var ok = got === ex[3][person];
+        return "<tr><td>" + ex[0] + "</td><td>" + EXAMPLE_PEOPLE[person] + "</td><td>" + signed(ex[3][person]) + "</td><td>" + signed(got) + "</td>" +
+          '<td class="mark">' + (ok ? "✓ matches" : "✗ differs") + "</td></tr>";
+      }).join("");
     }).join("");
 
     var P = window.SETTINGS.points;

@@ -77,8 +77,19 @@ A mobile-first web game about spotting misinformation in group chats.
   `evidence` clues counts as right. Share skips this step.
 - Tools cost their ticks once per post. The forward counter starts at 4 (the
   GDD's "caught at S = 4") and adds 1 per tick until sprint 4's spread formula.
-- Still open: how replies to true posts are scored (the GDD's R table was made
-  for corrections).
+- Replies (sprint 3): every verdict gets a reply, then the person's answer in
+  character. After Share you agree (`replies.share`); after Stop or Needs
+  context you correct (`replies.stop`), even when the verdict was wrong. Three
+  replies each in the group and in private; private opens a one-on-one chat.
+- R = E + trait weights + T, exactly as the GDD (no roasts, so J = 0). E is +2
+  when the reply names the post's real trick (whether or not the player found
+  it in the proof step), 0 for nothing, −3 for a wrong reason.
+- The GDD's reaction and trust tables apply to every reply, true posts too.
+  Extras: +5 for a correction accepted in private (accepts or stung), −10 for
+  a wrong reason, +5 for agreeing with a true post. Trust starts at 50.
+  A reply that raises trust is +1 point, even when agreeing with a fake.
+- Answers depend on the person, the stance (agreeing or correcting) and the
+  reaction, not on whether the post is true: the person doesn't know.
 
 ## Victor's commands
 

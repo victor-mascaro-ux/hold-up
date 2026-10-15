@@ -24,13 +24,17 @@
 
   <div class="chat" id="chat" hidden>
     <header class="chat-bar">
-      <div class="group-icon" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z"/></svg>
+      <div class="who" id="group-who">
+        <div class="group-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z"/></svg>
+        </div>
+        <div class="chat-title">
+          <h1 class="chat-name" data-text="familyGroupName"></h1>
+          <p class="chat-members" data-text="familyMembers"></p>
+        </div>
       </div>
-      <div class="chat-title">
-        <h1 class="chat-name" data-text="familyGroupName"></h1>
-        <p class="chat-members" data-text="familyMembers"></p>
-      </div>
+      <!-- A one-on-one chat, while you reply to someone privately -->
+      <div class="who" id="private-who" hidden></div>
       <div class="score-chip" id="score">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>
         <span id="score-value"></span>

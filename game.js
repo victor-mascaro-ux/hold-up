@@ -19,8 +19,10 @@
   var settingsPanel = document.getElementById("settings-panel");
 
   // Where the player is. `shown` holds the posts in the chat, each with the
-  // tools used, the verdict, the proof and its score. `phase` says what the
-  // bottom panel shows: typing, judging, proof, result or done.
+  // tools used, the verdict, the proof, the reply and their scores. `phase`
+  // says what the bottom panel shows: typing, judging, proof, result, reply,
+  // reacting (they're typing their answer), reacted or done. `trust` is each
+  // person's trust in you; `channel` is where you're replying.
   var game = {
     language: null,
     shown: [],
@@ -29,6 +31,9 @@
     trayOpen: false,
     tool: null,
     picked: null,
+    channel: "group",
+    pickedReply: null,
+    trust: {},
     numbers: false
   };
   var typingTimer = null;
@@ -53,7 +58,23 @@
     source: '<circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
     article: '<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7M9 8h3"/>',
     clock: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
-    close: '<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>'
+    close: '<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',
+    send: '<path d="M4 12l16-8-6 16-3-7z"/>',
+    reply: '<path d="M9 7L4 12l5 5"/><path d="M4 12h10a6 6 0 0 1 6 6"/>',
+    group: '<circle cx="9" cy="9" r="3.5"/><path d="M3 19c.8-3 3.2-5 6-5s5.2 2 6 5"/><path d="M16 6.5a3 3 0 0 1 0 6"/><path d="M18 14.5c1.4.7 2.4 2.3 2.8 4.5"/>',
+    lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'
+  };
+
+  // How each reaction shows: its label, and the face the person makes
+  var REACTION_TEXT = { accepts: "reactionAccepts", stung: "reactionStung", ignores: "reactionIgnores", digsIn: "reactionDigsIn" };
+  var FACE = { accepts: "relieved", stung: "stung", ignores: "neutral", digsIn: "pouting" };
+  var CHANGE_TEXT = {
+    accepts: "changeAccepts", stung: "changeStung", ignores: "changeIgnores", digsIn: "changeDigsIn",
+    acceptedInPrivate: "changeAcceptedInPrivate", wrongReason: "changeWrongReason", confirmedTrue: "changeConfirmedTrue"
+  };
+  var FEATURE_TEXT = {
+    empathy: "featureEmpathy", source: "featureSource", joke: "featureJoke", short: "featureShort",
+    private: "featurePrivate", trueAlternative: "featureTrueAlternative", question: "featureQuestion"
   };
   var VERDICTS = ["share", "stop", "needs-context"];
   var VERDICT_TEXT = { share: "share", stop: "stop", "needs-context": "needsContext" };
@@ -218,8 +239,8 @@
         esc(text("youSaid", { verdict: text(VERDICT_TEXT[entry.choice]) })) + "</span>";
     }
     var forwards = Scoring.forwards(Scoring.ticks(entry.used));
-    var time = entry.arrived.toLocaleTimeString(game.language, { hour: "numeric", minute: "2-digit" });
-    return '<div class="message-row">' + window.Characters.avatar(post.sender, "neutral", 44) +
+    var time = clock(entry.arrived);
+    return '<div class="message-row">' + personAvatar(post.sender, "neutral", 44) +
       '<div class="bubble post' + (isCurrent && !entry.choice ? " judged" : "") + (checkable ? " checkable" : "") + '"' +
       (checkable ? ' role="button" tabindex="0" aria-label="' + esc(text("checkPost", { post: text(post.sender + "Post") })) + '"' : "") + ">" +
       '<div class="post-top"><div class="sender">' + esc(senderName(post)) + "</div>" +
@@ -232,18 +253,102 @@
       "</div></div>";
   }
 
-  function typingBubble(post) {
-    var name = senderName(post);
-    return '<div class="message-row">' + window.Characters.avatar(post.sender, "neutral", 44) +
-      '<div class="bubble typing" role="status"><span class="sender">' + esc(text("typing", { name: name })) + "</span>" +
+  function clock(date) {
+    return date.toLocaleTimeString(game.language, { hour: "numeric", minute: "2-digit" });
+  }
+
+  // A person's face, with a ring around it showing their trust in you
+  function personAvatar(id, face, size) {
+    var avatar = window.Characters.avatar(id, face, size);
+    if (!(id in game.trust)) return avatar;
+    var trust = game.trust[id];
+    var box = size + 8;
+    var r = size / 2 + 2;
+    var round = 2 * Math.PI * r;
+    var max = window.SETTINGS.trustMax;
+    return '<span class="trust-avatar" role="img" aria-label="' + esc(text(id + "Trust", { n: trust })) + '" style="width:' + box + "px;height:" + box + 'px">' +
+      '<svg class="trust-ring" viewBox="0 0 ' + box + " " + box + '" aria-hidden="true">' +
+      '<circle class="track" cx="' + box / 2 + '" cy="' + box / 2 + '" r="' + r + '"/>' +
+      '<circle class="fill" cx="' + box / 2 + '" cy="' + box / 2 + '" r="' + r + '" stroke-dasharray="' + round.toFixed(2) +
+      '" stroke-dashoffset="' + (round * (1 - trust / max)).toFixed(2) + '" transform="rotate(-90 ' + box / 2 + " " + box / 2 + ')"/>' +
+      "</svg>" + avatar + "</span>";
+  }
+
+  function typingBubble(id) {
+    return '<div class="message-row">' + personAvatar(id, "neutral", 44) +
+      '<div class="bubble typing" role="status"><span class="sender">' + esc(text("typing", { name: text(id) })) + "</span>" +
       '<span class="typing-dots" aria-hidden="true"><span></span><span></span><span></span></span></div></div>';
   }
 
+  function replyOf(entry) {
+    return POSTS[entry.index].replies[entry.reply.stance][entry.reply.channel][entry.reply.index];
+  }
+
+  // Your reply, on the right
+  function myBubble(entry) {
+    return '<div class="message-row mine"><div class="bubble mine">' + esc(replyOf(entry)[game.language]) +
+      '<span class="time">' + esc(clock(entry.reply.sentAt)) + "</span></div></div>";
+  }
+
+  // Their answer, with the face that goes with it
+  function answerBubble(entry) {
+    var post = POSTS[entry.index];
+    var a = entry.reply.answer;
+    var key = post.sender + (entry.reply.stance === "share" ? "Share" : "Stop") +
+      { accepts: "Accepts", stung: "Stung", ignores: "Ignores", digsIn: "DigsIn" }[a.reaction];
+    return '<div class="message-row">' + personAvatar(post.sender, FACE[a.reaction], 44) +
+      '<div class="bubble"><div class="sender">' + esc(senderName(post)) + "</div>" + esc(text(key)) +
+      '<span class="time">' + esc(clock(entry.reply.answeredAt)) + "</span></div></div>";
+  }
+
+  // The reply and answer under a post, if they happened in this channel
+  function conversation(entry, channel) {
+    if (!entry.reply || entry.reply.channel !== channel || !entry.reply.sentAt) return "";
+    var html = myBubble(entry);
+    if (entry.reply.answeredAt) html += answerBubble(entry);
+    else if (entry === current() && game.phase === "reacting") html += typingBubble(POSTS[entry.index].sender);
+    return html;
+  }
+
+  // In a private chat: what they shared in the group, then just the two of you
+  function privateThread(entry) {
+    var post = POSTS[entry.index];
+    var t = post.text[game.language];
+    return '<div class="context-card"><div class="context-label">' + icon("group", 14) +
+      esc(text("sharedInGroup", { name: text(post.sender + "Short") })) + "</div>" +
+      '<div class="context-headline">' + esc(t.headline) + "</div></div>" +
+      conversation(entry, "private");
+  }
+
+  // Replying privately turns the screen into a one-on-one chat
+  function inPrivate() {
+    var entry = current();
+    return !!entry && game.channel === "private" && ["reply", "reacting", "reacted"].indexOf(game.phase) !== -1 && !!entry;
+  }
+
+  function renderHeader() {
+    var privately = inPrivate();
+    document.getElementById("group-who").hidden = privately;
+    var who = document.getElementById("private-who");
+    who.hidden = !privately;
+    if (privately) {
+      var sender = POSTS[current().index].sender;
+      who.innerHTML = personAvatar(sender, "neutral", 40) +
+        '<div class="chat-title"><div class="chat-name">' + esc(text(sender + "Short")) + "</div>" +
+        '<p class="chat-members">' + icon("lock", 12) + " " + esc(text("privateChat")) + "</p></div>";
+    }
+  }
+
   function renderMessages() {
-    var html = game.shown.map(function (entry, i) {
-      return postBubble(entry, i === game.shown.length - 1);
-    }).join("");
-    if (game.phase === "typing") html += typingBubble(POSTS[game.next]);
+    var html;
+    if (inPrivate()) {
+      html = privateThread(current());
+    } else {
+      html = game.shown.map(function (entry, i) {
+        return postBubble(entry, i === game.shown.length - 1) + conversation(entry, "group");
+      }).join("");
+      if (game.phase === "typing") html += typingBubble(POSTS[game.next].sender);
+    }
     messages.innerHTML = html;
 
     // The counter jumps a little when a tick forwards the post again
@@ -387,6 +492,56 @@
       proofLines(post, entry) +
       '<p class="result-explain">' + esc(post.text[game.language].explain) + "</p>" +
       numberLines(entry) +
+      '<button type="button" class="primary" data-action="reply">' + icon("reply", 20) +
+      esc(text(post.sender === "nina" ? "replyToNina" : "replyToJorge")) + "</button>";
+  }
+
+  // How R adds up, for "Show the numbers"
+  function rLine(R) {
+    var parts = [text("partProof", { points: signed(R.proof.points), what: text(R.proof.kind) })]
+      .concat(R.features.map(function (f) { return text(FEATURE_TEXT[f.name]) + " " + signed(f.weight); }))
+      .concat([text("partTrustBonus", { points: signed(R.trustBonus) })]);
+    return text("rLine", { parts: parts.join(" + "), total: number(R.total) });
+  }
+
+  // The reply screen: group or private at the top, three replies, Send
+  function replyPanel(post, entry) {
+    var stance = Scoring.stanceOf(entry.choice);
+    var replies = post.replies[stance][game.channel];
+    var trust = game.trust[post.sender];
+    return '<div class="tabs">' +
+      '<button type="button" data-channel="group" aria-pressed="' + (game.channel === "group") + '">' + icon("group", 16) + esc(text("inGroup")) + "</button>" +
+      '<button type="button" data-channel="private" aria-pressed="' + (game.channel === "private") + '">' + icon("lock", 16) +
+      esc(text(post.sender === "nina" ? "privatelyNina" : "privatelyJorge")) + "</button></div>" +
+      '<h2 class="panel-title" tabindex="-1">' + esc(text("whatDoYouSay")) + "</h2>" +
+      '<div class="reply-options">' + replies.map(function (reply, i) {
+        var picked = game.pickedReply === i;
+        var preview = "";
+        if (game.numbers) {
+          var a = Scoring.answer(post, reply, stance, game.channel, post.sender, trust);
+          preview = '<span class="numbers">' + esc(text("replyPreview", { n: number(a.R.total), reaction: text(CHANGE_TEXT[a.reaction]) })) + "</span>";
+        }
+        return '<button type="button" class="reply-option" data-reply="' + i + '" aria-pressed="' + picked + '">' +
+          '<span class="dot">' + (picked ? icon("tick", 13) : "") + "</span>" +
+          '<span class="reply-words">' + esc(reply[game.language]) + preview + "</span></button>";
+      }).join("") + "</div>" +
+      '<button type="button" class="primary" data-action="send"' + (game.pickedReply === null ? " disabled" : "") + ">" +
+      icon("send", 20) + esc(text("send")) + "</button>";
+  }
+
+  // After their answer: how they took it, then the next post
+  function reactedPanel(post, entry) {
+    var a = entry.reply.answer;
+    var numbers = "";
+    if (game.numbers) {
+      var changes = a.changes.map(function (c) { return text(CHANGE_TEXT[c.why]) + " " + signed(c.amount); }).join(", ");
+      numbers = '<p class="numbers">' + esc(rLine(a.R)) + "<br>" +
+        esc(text("trustLine", { before: a.trustBefore, after: a.trustAfter, changes: changes })) + "<br>" +
+        esc(text("pointsReply", { points: signed(a.points) })) + "</p>";
+    }
+    return '<h2 class="panel-title reaction-line" tabindex="-1">' + window.Characters.avatar(post.sender, FACE[a.reaction], 32) +
+      esc(text(REACTION_TEXT[a.reaction], { name: text(post.sender + "Short") })) + "</h2>" +
+      numbers +
       '<button type="button" class="primary" data-action="next">' + esc(text("next")) + icon("next", 20) + "</button>";
   }
 
@@ -401,7 +556,7 @@
 
   function renderPanel() {
     var entry = current();
-    if (game.phase === "typing" || !entry) {
+    if (game.phase === "typing" || game.phase === "reacting" || !entry) {
       panel.hidden = true;
       return;
     }
@@ -414,10 +569,16 @@
     if (game.phase === "judging") panel.innerHTML = judgingPanel(post, entry);
     else if (game.phase === "proof") panel.innerHTML = proofPanel(post, entry);
     else if (game.phase === "result") panel.innerHTML = resultPanel(post, entry);
+    else if (game.phase === "reply") panel.innerHTML = replyPanel(post, entry);
+    else if (game.phase === "reacted") panel.innerHTML = reactedPanel(post, entry);
     else panel.innerHTML = donePanel();
 
     if (focused) {
-      var key = focused.tool ? '[data-tool="' + focused.tool + '"]' : focused.clue ? '[data-clue="' + focused.clue + '"]' : null;
+      var key = focused.tool ? '[data-tool="' + focused.tool + '"]'
+        : focused.clue ? '[data-clue="' + focused.clue + '"]'
+        : focused.reply ? '[data-reply="' + focused.reply + '"]'
+        : focused.channel ? '[data-channel="' + focused.channel + '"]'
+        : null;
       var again = key && panel.querySelector(key);
       if (again) again.focus();
     }
@@ -425,8 +586,12 @@
 
   // ---------------------------------------------------------------- score
 
+  // Verdict points, plus a point for each answered reply that raised trust
   function totalScore() {
-    return game.shown.reduce(function (sum, entry) { return sum + (entry.result ? entry.result.total : 0); }, 0);
+    return game.shown.reduce(function (sum, entry) {
+      var reply = entry.reply && entry.reply.answeredAt ? entry.reply.answer.points : 0;
+      return sum + (entry.result ? entry.result.total : 0) + reply;
+    }, 0);
   }
 
   function renderScore() {
@@ -442,6 +607,7 @@
   }
 
   function render() {
+    renderHeader();
     renderMessages();
     renderPanel();
     renderScore();
@@ -459,19 +625,65 @@
     game.trayOpen = false;
     game.tool = null;
     game.picked = null;
+    game.channel = "group";
+    game.pickedReply = null;
     render();
     typingTimer = setTimeout(function () {
-      game.shown.push({ index: index, arrived: new Date(), used: Scoring.noTools(), choice: null, proof: null, result: null });
+      game.shown.push({ index: index, arrived: new Date(), used: Scoring.noTools(), choice: null, proof: null, result: null, reply: null });
       game.phase = "judging";
       lastForwards = 0;
       render();
     }, window.SETTINGS.typingSeconds * 1000);
   }
 
+  // A new game: no posts yet, and everyone's trust back where it starts
   function playFrom(index) {
     game.shown = [];
     lastScore = 0;
+    game.trust = {};
+    POSTS.forEach(function (post) { game.trust[post.sender] = window.SETTINGS.trustStart; });
     arrive(index);
+  }
+
+  // Every verdict gets a reply: agreeing after Share, correcting after Stop
+  // or Needs context
+  function startReply() {
+    game.phase = "reply";
+    game.channel = "group";
+    game.pickedReply = null;
+    render();
+    panel.querySelector(".panel-title").focus();
+  }
+
+  function switchChannel(channel) {
+    game.channel = channel;
+    game.pickedReply = null;
+    render();
+  }
+
+  // You send it; they type, then answer the way the GDD's reply model says
+  function send() {
+    var entry = current();
+    var post = POSTS[entry.index];
+    var stance = Scoring.stanceOf(entry.choice);
+    var reply = post.replies[stance][game.channel][game.pickedReply];
+    entry.reply = {
+      stance: stance,
+      channel: game.channel,
+      index: game.pickedReply,
+      answer: Scoring.answer(post, reply, stance, game.channel, post.sender, game.trust[post.sender]),
+      sentAt: new Date(),
+      answeredAt: null
+    };
+    game.phase = "reacting";
+    render();
+    typingTimer = setTimeout(function () {
+      entry.reply.answeredAt = new Date();
+      game.trust[post.sender] = entry.reply.answer.trustAfter;
+      game.phase = "reacted";
+      render();
+      panel.querySelector(".panel-title").focus();
+    }, window.SETTINGS.typingSeconds * 1000);
   }
 
   function openTray() {
@@ -524,6 +736,7 @@
       arrive(entry.index + 1);
     } else {
       game.phase = "done";
+      game.channel = "group";
       render();
       panel.querySelector(".panel-title").focus();
     }
@@ -550,6 +763,10 @@
     else if (data.action === "close-tools") { game.trayOpen = false; game.tool = null; render(); }
     else if (data.action === "confirm") prove(game.picked);
     else if (data.action === "not-sure") prove(null);
+    else if (data.action === "reply") startReply();
+    else if (data.channel) switchChannel(data.channel);
+    else if (data.reply) { game.pickedReply = Number(data.reply); render(); }
+    else if (data.action === "send") send();
     else if (data.action === "next") goOn();
     else if (data.action === "again") playFrom(0);
   });

@@ -381,7 +381,7 @@
         '<div class="messages">' + ninaPost(t, { judged: true, forwards: 14 }) + "</div>" +
         '<div class="panel">' +
         '<div class="tabs"><span>' + esc(t.inGroup) + '</span><span class="on">' + ic(I.check, 14) + esc(t.privately) + "</span></div>" +
-        '<div class="reply-options">' + post.replies.map(function (r, i) {
+        '<div class="reply-options">' + post.replies.stop.private.map(function (r, i) {
           return '<div class="reply-option' + (i === 0 ? " picked" : "") + '"><span class="dot">' + (i === 0 ? ic(I.check, 13, 3) : "") + "</span><span>" + esc(r[language]) + "</span></div>";
         }).join("") + "</div>" +
         '<div class="primary">' + ic(I.send, 18) + esc(t.send) + "</div></div>");
@@ -389,7 +389,7 @@
       var s5 = phone('<div class="bar"><div class="icon">' + ic(I.back) + "</div>" + Characters.avatar("nina", "relieved", 42) +
         '<div class="bar-title"><div class="bar-name display">' + esc(t.ninaShort) + '</div><div class="bar-members">' + esc(t.privateChat) + "</div></div></div>" +
         '<div class="messages">' +
-        '<div class="row mine"><div class="bubble">' + esc(post.replies[0][language]) + "</div></div>" +
+        '<div class="row mine"><div class="bubble">' + esc(post.replies.stop.private[0][language]) + "</div></div>" +
         '<div class="row">' + Characters.avatar("nina", "relieved", 44) + '<div class="bubble">' + esc(t.ninaAnswers) + "</div></div>" +
         '<div class="system">' + ic(I.trash, 15) + esc(t.deleted) + "</div>" +
         '<div class="system">' + ic(I.stop, 15) + esc(t.stopped) + "</div>" +

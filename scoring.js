@@ -126,7 +126,106 @@ window.Scoring = (function () {
     }
   };
 
+  // ---------------------------------------------------------------- replies
+  //
+  // Every verdict gets a reply, and the replies fit what you decided:
+  //   stance "share": you agree with the post (after Share)
+  //   stance "stop":  you correct it (after Stop or Needs context)
+  // A post's replies are post.replies[stance][channel], three each, where
+  // channel is "group" or "private". A reply is
+  // { features: [...], cites: a trick or null, en, "pt-BR" }; sending it
+  // privately adds the "private" feature. Everything follows the GDD's
+  // "Answering back".
+
+  function stanceOf(verdict) { return verdict === "share" ? "share" : "stop"; }
+
+  var REPLY_FEATURES = ["empathy", "source", "joke", "short", "private", "trueAlternative", "question"];
+
+  // T = round((trust − 50) / 25), from −2 to +2
+  function trustBonus(trust) {
+    var s = settings();
+    return Math.round((trust - s.trustMiddle) / s.trustStep);
+  }
+
+  // E: does the reply name the post's real trick, nothing, or the wrong reason?
+  function replyProof(post, reply) {
+    var proof = settings().replyProof;
+    if (!reply.cites) return { kind: "namesNothing", points: proof.namesNothing };
+    if (post.tricks.indexOf(reply.cites) !== -1) return { kind: "namesTheTrick", points: proof.namesTheTrick };
+    return { kind: "wrongReason", points: proof.wrongReason };
+  }
+
+  function replyFeatures(reply, channel) {
+    var list = reply.features.slice();
+    if (channel === "private" && list.indexOf("private") === -1) list.push("private");
+    return REPLY_FEATURES.filter(function (f) { return list.indexOf(f) !== -1; });
+  }
+
+  // R = E + Σ weight × feature + T (no roasts, so J = 0)
+  function receptionScore(post, reply, channel, person, trust) {
+    var weights = settings().traitWeights[person];
+    var proof = replyProof(post, reply);
+    var features = replyFeatures(reply, channel).map(function (f) { return { name: f, weight: weights[f] || 0 }; });
+    var bonus = trustBonus(trust);
+    var total = proof.points + bonus + features.reduce(function (sum, f) { return sum + f.weight; }, 0);
+    return { proof: proof, features: features, trustBonus: bonus, total: total };
+  }
+
+  // 4 or more accepts, 2 to 3 stung, −3 to 1 ignores, below −3 digs in
+  function reaction(R) {
+    var from = settings().reactionFrom;
+    if (R >= from.accepts) return "accepts";
+    if (R >= from.stung) return "stung";
+    if (R >= from.ignores) return "ignores";
+    return "digsIn";
+  }
+
+  // The whole answer to one reply: R, the reaction and the trust change.
+  // The reaction table applies to every reply. On top of it: a correction
+  // accepted in private saves their face, a wrong reason costs trust, and
+  // agreeing with a true post counts as confirming it.
+  function answer(post, reply, stance, channel, person, trust) {
+    var s = settings();
+    var r = receptionScore(post, reply, channel, person, trust);
+    var react = reaction(r.total);
+    var changes = [{ why: react, amount: s.trustChange[react] }];
+    if (stance === "stop" && channel === "private" && (react === "accepts" || react === "stung")) {
+      changes.push({ why: "acceptedInPrivate", amount: s.trustExtra.acceptedInPrivate });
+    }
+    if (r.proof.kind === "wrongReason") changes.push({ why: "wrongReason", amount: s.trustExtra.wrongReason });
+    if (stance === "share" && truth(post) === "true" && r.proof.kind !== "wrongReason") {
+      changes.push({ why: "confirmedTrue", amount: s.trustExtra.confirmedTrue });
+    }
+    var change = changes.reduce(function (sum, c) { return sum + c.amount; }, 0);
+    var after = Math.max(s.trustMin, Math.min(s.trustMax, trust + change));
+    return {
+      R: r,
+      reaction: react,
+      changes: changes,
+      trustBefore: trust,
+      trustAfter: after,
+      points: after > trust ? s.points.replyRaisedTrust : 0
+    };
+  }
+
+  // Every reply a post offers after a stance, with the channel it's sent in
+  function replyOptions(post, stance) {
+    var list = [];
+    ["group", "private"].forEach(function (channel) {
+      (post.replies[stance][channel] || []).forEach(function (reply, i) {
+        list.push({ channel: channel, index: i, reply: reply });
+      });
+    });
+    return list;
+  }
+
   return {
+    stanceOf: stanceOf,
+    trustBonus: trustBonus,
+    receptionScore: receptionScore,
+    reaction: reaction,
+    answer: answer,
+    replyOptions: replyOptions,
     tools: TOOLS.slice(),
     noTools: noTools,
     revealedBy: revealedBy,
