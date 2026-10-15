@@ -3,19 +3,12 @@
 (function () {
   var LANGUAGES = ["en", "pt-BR"];
   var SAVED_LANGUAGE_KEY = "holdup.language";
-  var TICK = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" ' +
-    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  var WELCOME_CAST = ["jorge", "nina", "mom", "rosa"];
 
+  var welcome = document.getElementById("welcome");
+  var chat = document.getElementById("chat");
   var settingsButton = document.getElementById("settings-button");
   var settingsPanel = document.getElementById("settings-panel");
-
-  // A saved choice wins. Otherwise phones set to Portuguese start in PT-BR,
-  // and every other phone starts in English.
-  function pickLanguage(saved, phoneLanguages) {
-    if (LANGUAGES.indexOf(saved) !== -1) return saved;
-    var first = (phoneLanguages && phoneLanguages[0]) || "";
-    return first.toLowerCase().indexOf("pt") === 0 ? "pt-BR" : "en";
-  }
 
   // The browser can refuse storage (private mode, blocked site data), so the
   // game still works, it just won't remember.
@@ -27,12 +20,63 @@
     try { localStorage.setItem(SAVED_LANGUAGE_KEY, language); } catch (e) {}
   }
 
-  function phoneLanguages() {
-    if (navigator.languages && navigator.languages.length) return navigator.languages;
-    return [navigator.language || ""];
+  function forgetLanguage() {
+    try { localStorage.removeItem(SAVED_LANGUAGE_KEY); } catch (e) {}
   }
 
-  function showLanguage(language) {
+  // A span of text in one language, tagged so screen readers pronounce it right
+  function inLanguage(language, text) {
+    var span = document.createElement("span");
+    span.lang = language;
+    span.textContent = text;
+    return span;
+  }
+
+  // The welcome screen speaks both languages until one is chosen
+  function buildWelcome() {
+    var title = document.getElementById("welcome-title");
+    var prompt = document.getElementById("welcome-prompt");
+    var buttons = document.getElementById("welcome-buttons");
+
+    LANGUAGES.forEach(function (language, i) {
+      var texts = window.TEXTS[language];
+      if (i > 0) {
+        var slash = document.createElement("span");
+        slash.className = "welcome-slash";
+        slash.setAttribute("aria-hidden", "true");
+        slash.textContent = " / ";
+        title.appendChild(slash);
+      }
+      title.appendChild(inLanguage(language, texts.gameTitle));
+      prompt.appendChild(inLanguage(language, texts.chooseLanguage));
+
+      var button = document.createElement("button");
+      button.type = "button";
+      button.className = "welcome-button";
+      button.lang = language;
+      button.textContent = texts.languageName;
+      button.addEventListener("click", function () {
+        saveLanguage(language);
+        startGame(language);
+      });
+      buttons.appendChild(button);
+    });
+
+    document.getElementById("welcome-cast").innerHTML = WELCOME_CAST.map(function (id) {
+      return window.Characters.avatar(id, "relieved", 64);
+    }).join("");
+  }
+
+  function showWelcome() {
+    document.documentElement.lang = "en";
+    document.title = LANGUAGES.map(function (language) {
+      return window.TEXTS[language].gameTitle;
+    }).join(" / ");
+    chat.hidden = true;
+    welcome.hidden = false;
+  }
+
+  function startGame(language) {
     var texts = window.TEXTS[language];
     document.documentElement.lang = language;
     document.title = texts.gameTitle;
@@ -42,16 +86,14 @@
     document.querySelectorAll("[data-label]").forEach(function (element) {
       element.setAttribute("aria-label", texts[element.dataset.label]);
     });
-    document.querySelectorAll(".language-option").forEach(function (option) {
-      option.setAttribute("aria-pressed", String(option.dataset.language === language));
-    });
+    welcome.hidden = true;
+    chat.hidden = false;
   }
 
   function openSettings() {
     settingsPanel.hidden = false;
     settingsButton.setAttribute("aria-expanded", "true");
-    var chosen = settingsPanel.querySelector('[aria-pressed="true"]');
-    if (chosen) chosen.focus();
+    settingsPanel.querySelector("button").focus();
   }
 
   function closeSettings(returnFocus) {
@@ -61,28 +103,16 @@
     if (returnFocus) settingsButton.focus();
   }
 
-  // Each language is named in its own language, so anyone can find theirs
-  function buildLanguageOptions() {
-    var holder = settingsPanel.querySelector(".language-options");
-    LANGUAGES.forEach(function (language) {
-      var option = document.createElement("button");
-      option.type = "button";
-      option.className = "language-option";
-      option.lang = language;
-      option.dataset.language = language;
-      option.innerHTML = "<span></span>" + TICK;
-      option.firstChild.textContent = window.TEXTS[language].languageName;
-      option.addEventListener("click", function () {
-        saveLanguage(language);
-        showLanguage(language);
-        closeSettings(true);
-      });
-      holder.appendChild(option);
-    });
-  }
-
   settingsButton.addEventListener("click", function () {
     if (settingsPanel.hidden) openSettings(); else closeSettings(false);
+  });
+
+  // Start over goes back to the welcome screen, where the language is chosen
+  // again. Once progress is saved, it will also clear it (and ask first).
+  document.getElementById("start-over").addEventListener("click", function () {
+    closeSettings(false);
+    forgetLanguage();
+    showWelcome();
   });
 
   // Tapping anywhere else, or pressing Escape, closes the settings
@@ -93,9 +123,7 @@
     if (event.key === "Escape") closeSettings(true);
   });
 
-  // Shared so the language rule can be tested from the browser console.
-  window.HoldUp = { pickLanguage: pickLanguage };
-
-  buildLanguageOptions();
-  showLanguage(pickLanguage(loadSavedLanguage(), phoneLanguages()));
+  buildWelcome();
+  var saved = loadSavedLanguage();
+  if (LANGUAGES.indexOf(saved) !== -1) startGame(saved); else showWelcome();
 })();

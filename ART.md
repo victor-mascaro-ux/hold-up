@@ -114,6 +114,7 @@ or wrong, tap targets at least 44px.
   game works offline and nobody is tracked.
 - Every sender name is brick, as above (the reference shows Aunt Rosa's in sage;
   brick wins).
-- The language choice sits behind a settings button at the right of the chat
-  header.
+- The language is chosen once, on a welcome screen (title, the Family faces,
+  two big language buttons at the bottom). The settings button at the right of
+  the chat header holds "Start over".
 - No back arrow in the chat header until there is a chat list to go back to.

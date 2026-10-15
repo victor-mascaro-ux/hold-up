@@ -34,7 +34,11 @@ body {
 
 button { font: inherit; color: inherit; }
 
-/* One chat fills the phone screen. On a computer it stays phone-width for now. */
+/* Screens are switched with the hidden attribute; keep it stronger than display rules */
+[hidden] { display: none !important; }
+
+/* Each screen fills the phone. On a computer it stays phone-width for now. */
+.welcome,
 .chat {
   display: flex;
   flex-direction: column;
@@ -43,6 +47,73 @@ button { font: inherit; color: inherit; }
   max-width: 480px;
   margin: 0 auto;
   background: var(--cream);
+}
+
+/* Welcome: title and the Family at the top, the language choice within thumb reach */
+.welcome {
+  justify-content: space-between;
+  gap: 24px;
+  padding: calc(48px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+
+.welcome-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  text-align: center;
+}
+
+.welcome-title {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 1.2;
+}
+
+.welcome-slash { color: var(--muted); }
+
+.welcome-cast {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.welcome-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.welcome-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.4;
+  color: var(--cocoa);
+}
+
+.welcome-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.welcome-button {
+  min-height: 64px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--white);
+  box-shadow: 0 1px 0 var(--shadow);
+  font-weight: 800;
+  font-size: 17px;
+  cursor: pointer;
 }
 
 /* Top bar: group icon, group name and members, settings */
@@ -119,33 +190,18 @@ button { font: inherit; color: inherit; }
   position: absolute;
   top: calc(100% - 4px);
   right: 10px;
-  width: min(260px, calc(100% - 20px));
-  padding: 14px 8px 8px;
+  width: min(240px, calc(100% - 20px));
+  padding: 8px;
   background: var(--white);
   border-radius: 12px;
   box-shadow: 0 1px 0 var(--shadow), 0 10px 28px rgba(59, 42, 32, 0.16);
 }
 
-.settings-panel[hidden] { display: none; }
-
-.panel-title {
-  margin: 0 8px 8px;
-  font-family: var(--display);
-  font-weight: 600;
-  font-size: 17px;
-}
-
-.language-options {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.language-option {
+.menu-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 12px;
+  width: 100%;
   min-height: 48px;
   padding: 0 12px;
   border: 0;
@@ -157,14 +213,9 @@ button { font: inherit; color: inherit; }
   cursor: pointer;
 }
 
-/* The chosen language is shown by a tick and weight, not colour alone */
-.language-option[aria-pressed="true"] {
-  background: var(--cream);
-  font-weight: 800;
-}
+.menu-item svg { flex: none; }
 
-.language-option svg { flex: none; visibility: hidden; }
-.language-option[aria-pressed="true"] svg { visibility: visible; }
+.menu-item:hover { background: var(--cream); }
 
 /* Where the messages will appear */
 .chat-messages {

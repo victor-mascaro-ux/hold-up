@@ -3,13 +3,16 @@
 window.TEXTS = window.TEXTS || {};
 
 window.TEXTS["en"] = {
-  // Browser tab title
+  // Game title, also the browser tab title
   gameTitle: "Hold Up!",
+
+  // Welcome screen, where the language is chosen once (it shows both languages)
+  chooseLanguage: "Choose your language",
+  languageName: "English",
 
   // Settings, behind the button at the right of the chat header
   settings: "Settings",
-  languageTitle: "Language",
-  languageName: "English",
+  startOver: "Start over",
 
   // Family chat
   familyGroupName: "Family 🙏 (NO politics!!)",

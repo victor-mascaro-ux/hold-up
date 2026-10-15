@@ -463,8 +463,9 @@ The game should feel like your own phone, only friendlier. The closer it looks t
   - Warm, flat illustration with expressive avatars that react to your replies (a relieved smile, a crossed-arms pout). Calm enough for adults, friendly enough for kids.
 - **Tone**
   - Gentle humor that never mocks the people who fall for things. Everyone gets fooled sometimes, including the player, and the game says so.
-- **Language switch**
-  - English or Brazilian Portuguese from the first screen, changeable any time in settings.
+- **Language choice**
+  - English or Brazilian Portuguese, chosen once on the first screen.
+  - Posts are written for each language, so the language can't change mid-game; "Start over" in settings goes back to the first screen.
 - **Accessibility**
   - Large-text option, captions on every voice note, playable one-handed, and color is never the only signal of right or wrong.
 

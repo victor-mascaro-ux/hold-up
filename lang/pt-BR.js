@@ -3,13 +3,16 @@
 window.TEXTS = window.TEXTS || {};
 
 window.TEXTS["pt-BR"] = {
-  // Browser tab title
+  // Game title, also the browser tab title
   gameTitle: "Peraí!",
+
+  // Welcome screen, where the language is chosen once (it shows both languages)
+  chooseLanguage: "Escolha seu idioma",
+  languageName: "Português (Brasil)",
 
   // Settings, behind the button at the right of the chat header
   settings: "Configurações",
-  languageTitle: "Idioma",
-  languageName: "Português (Brasil)",
+  startOver: "Recomeçar",
 
   // Family chat
   familyGroupName: "Família Unida ❤️🙏",

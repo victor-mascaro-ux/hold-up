@@ -28,9 +28,10 @@ A mobile-first web game about spotting misinformation in group chats.
   ART.md), `game.js` (the code), `lang/` (texts), `characters.js` (the cast,
   one SVG per character with a face setting), `fonts/fonts.css` (Fredoka and
   Nunito, embedded so they work offline), `art/` (reference and cast sheet).
-- The language choice sits behind the settings button in the chat header and
-  is remembered in the browser. On a first visit, phones set to Portuguese
-  start in PT-BR and everything else in English.
+- The language is chosen once, on the welcome screen, and remembered in the
+  browser. Posts are written for each language, so it never changes mid-game:
+  the only way back is "Start over" in the settings card, which returns to the
+  welcome screen (and, once progress is saved, will clear it after asking).
 - Every number from the GDD (scores, weights, trust, spread) lives in one
   settings file that Victor can read and edit. No numbers in the code.
 - Mobile first: design for a phone held in one hand, with the main buttons
