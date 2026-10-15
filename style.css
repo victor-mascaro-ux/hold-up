@@ -548,3 +548,216 @@ button { font: inherit; color: inherit; }
 }
 
 .done-score { margin: 0; font-size: 15.5px; color: var(--cocoa); }
+
+/* Score, at the top of the chat */
+.score-chip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--white);
+  box-shadow: 0 1px 0 var(--shadow);
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.score-chip.bump { animation: bump 0.4s ease-out; }
+
+@keyframes bump {
+  40% { transform: scale(1.12); }
+}
+
+/* The post being judged can be tapped to open the tools */
+.post.checkable { cursor: pointer; }
+.post.checkable:focus-visible { outline: 2.5px solid var(--rust); outline-offset: 3px; }
+
+/* "Forwarded _ times" */
+.forward-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--blush);
+  color: var(--brick);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.forward-count.bump { animation: bump 0.4s ease-out; }
+
+.post-foot { flex-wrap: wrap; row-gap: 6px; }
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.hint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12.5px;
+  color: var(--cocoa);
+  text-align: right;
+}
+
+.close-tools {
+  width: var(--tap);
+  height: var(--tap);
+  margin: -8px -6px -8px 0;
+}
+
+/* The tool tray */
+.tools {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.tool {
+  position: relative;
+  min-height: 72px;
+  padding: 6px 4px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--white);
+  box-shadow: 0 1px 0 var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+  cursor: pointer;
+}
+
+.tool[aria-pressed="true"] { box-shadow: inset 0 0 0 2.5px var(--ink); }
+
+.tool:disabled { cursor: default; opacity: 0.45; }
+
+.tool .used {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--sage);
+  color: var(--white);
+  display: grid;
+  place-items: center;
+}
+
+.cost {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--cocoa);
+}
+
+.tool-result {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 1px 0 var(--shadow);
+  font-size: 14.5px;
+  line-height: 1.4;
+}
+
+.tool-result-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--cocoa);
+}
+
+.zoom-address {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.zoom-small { margin-top: 6px; font-size: 12.5px; color: var(--muted); }
+
+.source-name { font-weight: 800; }
+
+.article-text { margin: 0; padding-left: 20px; }
+.article-text li + li { margin-top: 6px; }
+
+.numbers {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--cocoa);
+}
+
+/* What gave it away: one clue to pick */
+.clues { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.clue {
+  min-height: var(--tap);
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--white);
+  box-shadow: 0 1px 0 var(--shadow);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.clue[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 2.5px var(--ink);
+  font-weight: 800;
+}
+
+.proof-actions {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+}
+
+.secondary {
+  min-height: 52px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--white);
+  box-shadow: 0 1px 0 var(--shadow);
+  font-weight: 800;
+  font-size: 15.5px;
+  cursor: pointer;
+}
+
+.primary:disabled { opacity: 0.45; cursor: default; }
+
+.clue-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--white);
+  box-shadow: 0 1px 0 var(--shadow);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ink);
+}

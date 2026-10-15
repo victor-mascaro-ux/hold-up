@@ -20,21 +20,58 @@ window.TEXTS["pt-BR"] = {
   jumpToPost: "Ir para o post",
   language: "Idioma",
   languageCode: "PT-BR",
+  showNumbers: "Mostrar os números",
+  on: "Ligado",
+  off: "Desligado",
+
+  // Score, at the top of the chat
+  scoreChip: "{n} pts",
+  score: "Pontuação: {n}",
 
   // Family chat
   familyGroupName: "Família Unida ❤️🙏",
   familyMembers: "Vô Jorge, Prima Nina, Mãe, Tia Rosa, você",
   messagesName: "Mensagens",
 
-  // People: full name in the chat, and whose post it is in the panel
+  // People: full name in the chat, whose post it is, and whose message
   nina: "Prima Nina",
   ninaPost: "Post da Nina",
+  ninaMessage: "A mensagem da Nina",
   jorge: "Vô Jorge",
   jorgePost: "Post do Vô",
+  jorgeMessage: "A mensagem do Vô",
 
   // Posts
   typing: "{name} está digitando…",
   forwarded: "Encaminhada",
+  forwardedTimes: "Encaminhada {n} vezes",
+  checkPost: "{post}: toque pra conferir",
+
+  // Checking tools, in the tray that opens when you tap the post
+  tapToCheck: "Toque no post pra conferir",
+  closeTools: "Fechar as ferramentas",
+  toolZoom: "Zoom",
+  toolSource: "Ver a fonte",
+  toolArticle: "Abrir a matéria",
+  toolFree: "grátis",
+  toolTicks: "+{n} tique",
+  noArticle: "Não tem matéria pra abrir",
+  zoomDate: "Data: {date}",
+  ticksSoFar: "Tiques até agora: {n} ({points})",
+
+  // Clues you can point at after Barrar or Falta contexto
+  whatGaveItAway: "O que entregou?",
+  thatsIt: "É isso",
+  notSure: "Não sei",
+  clueAddress: "O endereço do site",
+  clueHeadline: "A manchete",
+  cluePostText: "O texto do post",
+  clueAlertText: "O texto do alerta",
+  clueImage: "A imagem",
+  clueDate: "A data",
+  clueFinePrint: "As letras miúdas",
+  clueSource: "Quem postou",
+  clueParagraph: "A matéria, parágrafo {n}",
 
   // Pictures in posts, described for screen readers
   artGiftBox: "Imagem: uma caixa de presente e um vale-presente",
@@ -55,6 +92,13 @@ window.TEXTS["pt-BR"] = {
   theAnswer: "A resposta:",
   youPicked: "Você escolheu:",
   youSaid: "Você: {verdict}",
+  proofFound: "Você achou o que entregou:",
+  proofPointed: "Você apontou:",
+  proofNone: "Você não apontou nada.",
+  proofAnswer: "O que entregou:",
+  pointsVerdict: "Veredito: {points}",
+  pointsTicks: "Tiques: {n} × {each} = {points}",
+  pointsPost: "Este post: {points}",
   next: "Próximo post",
 
   // After the last post

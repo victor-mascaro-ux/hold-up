@@ -20,21 +20,58 @@ window.TEXTS["en"] = {
   jumpToPost: "Jump to post",
   language: "Language",
   languageCode: "EN",
+  showNumbers: "Show the numbers",
+  on: "On",
+  off: "Off",
+
+  // Score, at the top of the chat
+  scoreChip: "{n} pts",
+  score: "Score: {n}",
 
   // Family chat
   familyGroupName: "Family 🙏 (NO politics!!)",
   familyMembers: "Grandpa Jorge, Cousin Nina, Mom, Aunt Rosa, you",
   messagesName: "Messages",
 
-  // People: full name in the chat, and whose post it is in the panel
+  // People: full name in the chat, whose post it is, and whose message
   nina: "Cousin Nina",
   ninaPost: "Nina's post",
+  ninaMessage: "Nina's message",
   jorge: "Grandpa Jorge",
   jorgePost: "Grandpa's post",
+  jorgeMessage: "Grandpa's message",
 
   // Posts
   typing: "{name} is typing…",
   forwarded: "Forwarded",
+  forwardedTimes: "Forwarded {n} times",
+  checkPost: "{post}: tap to check it",
+
+  // Checking tools, in the tray that opens when you tap the post
+  tapToCheck: "Tap the post to check it",
+  closeTools: "Close the tools",
+  toolZoom: "Zoom",
+  toolSource: "Source card",
+  toolArticle: "Open the article",
+  toolFree: "free",
+  toolTicks: "+{n} tick",
+  noArticle: "No article to open",
+  zoomDate: "Date: {date}",
+  ticksSoFar: "Ticks so far: {n} ({points})",
+
+  // Clues you can point at after Stop or Needs context
+  whatGaveItAway: "What gave it away?",
+  thatsIt: "That's it",
+  notSure: "Not sure",
+  clueAddress: "The web address",
+  clueHeadline: "The headline",
+  cluePostText: "The post's words",
+  clueAlertText: "The alert's words",
+  clueImage: "The picture",
+  clueDate: "The date",
+  clueFinePrint: "The fine print",
+  clueSource: "Who posted it",
+  clueParagraph: "The article, paragraph {n}",
 
   // Pictures in posts, described for screen readers
   artGiftBox: "Picture: a gift box and a gift card",
@@ -55,6 +92,13 @@ window.TEXTS["en"] = {
   theAnswer: "The answer:",
   youPicked: "You picked:",
   youSaid: "You: {verdict}",
+  proofFound: "You found what gave it away:",
+  proofPointed: "You pointed at:",
+  proofNone: "You didn't point at anything.",
+  proofAnswer: "What gave it away:",
+  pointsVerdict: "Verdict: {points}",
+  pointsTicks: "Ticks: {n} × {each} = {points}",
+  pointsPost: "This post: {points}",
   next: "Next post",
 
   // After the last post

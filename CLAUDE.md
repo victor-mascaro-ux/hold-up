@@ -25,7 +25,10 @@ A mobile-first web game about spotting misinformation in group chats.
   language files: `lang/en.js` and `lang/pt-BR.js`, with the same names in
   both. No player-facing text in the code.
 - Files: `index.html` (the page), `style.css` (colours at the top, named as in
-  ART.md), `game.js` (the code), `lang/` (texts), `settings.js` (every
+  ART.md), `game.js` (the screen code), `scoring.js` (the rules for tools,
+  clues and points, no screen code; shared by the game and `report.html`),
+  `report.html` (plays every post three ways and shows the scores),
+  `lang/` (texts), `settings.js` (every
   number), `illustrations.js` (flat pictures for posts), `characters.js` (the cast,
   one SVG per character with a face setting), `fonts/fonts.css` (Fredoka and
   Nunito, embedded so they work offline), `art/` (reference, cast sheet and
@@ -65,6 +68,15 @@ A mobile-first web game about spotting misinformation in group chats.
 - The messenger's own name is still to be decided; nothing shows it yet.
 - The settings card's Test section (jump to a post, switch language) is for
   building only: take it out before strangers playtest.
+- Scoring (sprint 2): a correct Share is +3, like a proven Stop. Needs context
+  scores like Stop (+3 with the right proof, +1 without). Share on a fake or
+  misleading post −3; Stop or Needs context on a true post −3; mixing up Stop
+  and Needs context 0. Each tick before the verdict −0.5.
+- Proof: after Stop or Needs context the player taps one clue: anything
+  visible on the post plus what their tools revealed. Any of the post's
+  `evidence` clues counts as right. Share skips this step.
+- Tools cost their ticks once per post. The forward counter starts at 4 (the
+  GDD's "caught at S = 4") and adds 1 per tick until sprint 4's spread formula.
 - Still open: how replies to true posts are scored (the GDD's R table was made
   for corrections).
 

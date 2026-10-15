@@ -31,6 +31,10 @@
         <h1 class="chat-name" data-text="familyGroupName"></h1>
         <p class="chat-members" data-text="familyMembers"></p>
       </div>
+      <div class="score-chip" id="score">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>
+        <span id="score-value"></span>
+      </div>
       <button class="icon-button" id="settings-button" type="button" data-label="settings" aria-expanded="false" aria-controls="settings-panel">
         <svg width="22" height="22" viewBox="0 0 24 24" overflow="visible" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
@@ -50,6 +54,10 @@
             <span class="menu-row-name" data-text="language"></span>
             <div class="pills" id="language-buttons"></div>
           </div>
+          <div class="menu-row">
+            <span class="menu-row-name" data-text="showNumbers"></span>
+            <div class="pills" id="numbers-buttons"></div>
+          </div>
         </div>
       </div>
     </header>
@@ -63,6 +71,7 @@
   <script src="characters.js"></script>
   <script src="illustrations.js"></script>
   <script src="posts/family.js"></script>
+  <script src="scoring.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

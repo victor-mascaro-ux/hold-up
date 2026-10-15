@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scoring report</title>
+  <!-- Plays every post three ways (share everything, stop everything, perfect
+       play) with the game's own scoring rules (scoring.js) and numbers
+       (settings.js), and shows the points in a table. Change a number in
+       settings.js and reload this page to see what it does. -->
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <style>
+    :root {
+      --cream: #FBF3E6;
+      --sand: #F3E3C8;
+      --white: #FFFFFF;
+      --ink: #3B2A20;
+      --cocoa: #6B5444;
+      --muted: #7A5E48;
+      --brick: #9A4A28;
+      --terracotta: #E07A55;
+      --blush: #FBE3D6;
+      --sage: #3F6B47;
+      --marigold: #F6D27A;
+      --shadow: #EAD9BF;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--cream); color: var(--ink); font-family: "Nunito", system-ui, sans-serif; font-size: 15.5px; line-height: 1.4; }
+    h1, h2 { font-family: "Fredoka", "Nunito", sans-serif; font-weight: 600; margin: 0; }
+    .page { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; }
+    h1 { font-size: 26px; }
+    h2 { font-size: 18px; margin: 28px 0 10px; }
+    .intro { margin: 6px 0 0; color: var(--cocoa); max-width: 720px; }
+
+    .totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 20px; }
+    .total { background: var(--white); border-radius: 16px; padding: 14px; box-shadow: 0 1px 0 var(--shadow); }
+    .total .name { font-size: 13px; font-weight: 800; color: var(--cocoa); }
+    .total .points { font-family: "Fredoka", "Nunito", sans-serif; font-weight: 600; font-size: 32px; line-height: 1.1; margin-top: 4px; }
+
+    .table-wrap { overflow-x: auto; background: var(--white); border-radius: 16px; box-shadow: 0 1px 0 var(--shadow); }
+    table { width: 100%; min-width: 760px; border-collapse: collapse; }
+    th, td { text-align: left; vertical-align: top; padding: 10px 12px; }
+    thead th { background: var(--sand); font-size: 13px; font-weight: 800; color: var(--cocoa); }
+    tbody tr + tr td, tfoot td { box-shadow: inset 0 1px 0 var(--shadow); }
+    tfoot td { font-weight: 800; background: var(--cream); }
+    .post-title { font-weight: 700; }
+    .post-meta { font-size: 12.5px; color: var(--muted); }
+    .points { font-weight: 800; font-size: 17px; white-space: nowrap; }
+    .note { font-size: 12.5px; color: var(--cocoa); }
+    .mark { display: inline-flex; align-items: center; gap: 4px; }
+
+    .chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 2px 9px; font-size: 12px; font-weight: 800; white-space: nowrap; }
+    .verdict-share { background: var(--sage); color: var(--white); }
+    .verdict-stop { background: var(--terracotta); color: var(--ink); }
+    .verdict-needs-context { background: var(--marigold); color: var(--ink); }
+
+    .rules { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 16px; max-width: 760px; }
+    .rules li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; box-shadow: inset 0 -1px 0 var(--shadow); }
+    .rules b { white-space: nowrap; }
+
+    @media (max-width: 640px) {
+      .totals { grid-template-columns: minmax(0, 1fr); }
+      .rules { grid-template-columns: minmax(0, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Scoring report</h1>
+    <p class="intro">Every Family post, played three ways with the game's own scoring rules and the numbers in <code>settings.js</code>. Change a number there and reload this page to see what it does. Perfect play uses the cheapest tool that shows what gave the post away.</p>
+
+    <div class="totals" id="totals"></div>
+
+    <h2>Post by post</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Post</th><th>Right answer</th><th>Share everything</th><th>Stop everything</th><th>Perfect play</th></tr></thead>
+      <tbody id="rows"></tbody>
+      <tfoot><tr id="foot"></tr></tfoot>
+    </table></div>
+
+    <h2>The numbers in settings.js</h2>
+    <ul class="rules" id="rules"></ul>
+  </div>
+
+  <script src="settings.js"></script>
+  <script src="posts/family.js"></script>
+  <script src="scoring.js"></script>
+  <script>
+    // Labels for this report only (it's for building, so it's in English)
+    var STRATEGIES = [
+      ["shareEverything", "Share everything"],
+      ["stopEverything", "Stop everything"],
+      ["perfect", "Perfect play"]
+    ];
+    var VERDICTS = { share: "Share", stop: "Stop", "needs-context": "Needs context" };
+    var OUTCOMES = {
+      rightShare: "Right: a true post shared",
+      rightWithProof: "Right, with proof",
+      rightNoProof: "Right, but no proof",
+      sharedFalse: "Shared a fake or misleading post",
+      stoppedTrue: "Stopped a true post",
+      mixedUp: "Mixed up Stop and Needs context"
+    };
+    var TOOLS = { zoom: "Zoom", source: "Source card", article: "Open the article" };
+    var CLUES = {
+      "source.url": "the web address", headline: "the headline", image: "the picture", message: "the sender's message",
+      date: "the date", finePrint: "the fine print", "source.about": "who posted it"
+    };
+    var POINTS = [
+      ["rightVerdictRightProof", "Right verdict, right proof"],
+      ["rightVerdictNoProof", "Right verdict, wrong or no proof"],
+      ["rightShare", "Share on a true post"],
+      ["sharedFalse", "Share on a fake or misleading post"],
+      ["stoppedTrue", "Stop or Needs context on a true post"],
+      ["mixedUp", "Stop and Needs context mixed up"],
+      ["perTick", "Each tick before the verdict"]
+    ];
+
+    function esc(value) {
+      return String(value).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; });
+    }
+
+    function signed(n) { return (n > 0 ? "+" : "") + String(n + 0).replace("-", "−"); }
+
+    function clueName(clue) {
+      return CLUES[clue] || "the article, paragraph " + clue.replace("article.p", "");
+    }
+
+    function verdictChip(verdict) {
+      return '<span class="chip verdict-' + verdict + '">' + VERDICTS[verdict] + "</span>";
+    }
+
+    // What a strategy did with a post, in a few words
+    function describe(play, result) {
+      var tools = Scoring.tools.filter(function (t) { return play.used[t]; }).map(function (t) { return TOOLS[t]; });
+      var parts = [VERDICTS[play.verdict]];
+      if (tools.length) parts.push(tools.join(", ") + " (" + result.ticks + (result.ticks === 1 ? " tick" : " ticks") + ")");
+      if (play.proof) parts.push("pointed at " + clueName(play.proof));
+      return parts.join(" · ") + "<br>" + OUTCOMES[result.outcome];
+    }
+
+    var totals = {};
+    STRATEGIES.forEach(function (s) { totals[s[0]] = 0; });
+
+    document.getElementById("rows").innerHTML = window.POSTS.map(function (post, i) {
+      var cells = STRATEGIES.map(function (s) {
+        var play = Scoring.strategies[s[0]](post);
+        var result = Scoring.score(post, play);
+        totals[s[0]] += result.total;
+        return '<td><div class="points">' + signed(result.total) + '</div><div class="note">' + describe(play, result) + "</div></td>";
+      }).join("");
+      var tricks = post.tricks.length ? "Trick: " + post.tricks.join(", ").replace(/-/g, " ") : "True post";
+      return "<tr><td>" + (i + 1) + '</td><td><div class="post-title">' + esc(post.text.en.headline.length > 70 ? post.text.en.headline.slice(0, 68) + "…" : post.text.en.headline) +
+        '</div><div class="post-meta">' + esc(post.sender === "nina" ? "Cousin Nina" : "Grandpa Jorge") + " · " + esc(tricks) + "</div></td>" +
+        "<td>" + verdictChip(post.verdict) + "</td>" + cells + "</tr>";
+    }).join("");
+
+    document.getElementById("foot").innerHTML = '<td></td><td>Total</td><td></td>' + STRATEGIES.map(function (s) {
+      return '<td class="points">' + signed(totals[s[0]]) + "</td>";
+    }).join("");
+
+    document.getElementById("totals").innerHTML = STRATEGIES.map(function (s) {
+      return '<div class="total"><div class="name">' + s[1] + '</div><div class="points">' + signed(totals[s[0]]) + "</div></div>";
+    }).join("");
+
+    var P = window.SETTINGS.points;
+    document.getElementById("rules").innerHTML = POINTS.map(function (p) {
+      return "<li><span>" + p[1] + "</span><b>" + signed(P[p[0]]) + "</b></li>";
+    }).join("") +
+      "<li><span>Ticks: Zoom / Source card / Open the article</span><b>" +
+      [window.SETTINGS.toolTicks.zoom, window.SETTINGS.toolTicks.source, window.SETTINGS.toolTicks.article].join(" / ") + "</b></li>" +
+      "<li><span>Forwards at the start, and per tick</span><b>" + window.SETTINGS.forwardsAtStart + " / +" + window.SETTINGS.forwardsPerTick + "</b></li>";
+  </script>
+</body>
+</html>
