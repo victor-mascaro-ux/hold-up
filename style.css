@@ -24,8 +24,9 @@
 
 html, body { height: 100%; margin: 0; }
 
+/* White outside the phone column on wide screens; the chat itself stays cream */
 body {
-  background: var(--cream);
+  background: var(--white);
   color: var(--ink);
   font-family: var(--text);
   -webkit-text-size-adjust: 100%;
